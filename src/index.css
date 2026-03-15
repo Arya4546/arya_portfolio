@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: oklch(0.99 0.005 80);
+  --color-foreground: oklch(0.2 0.01 20);
+  --color-primary: oklch(0.35 0.06 142);
+  /* Deep Fern Green */
+  --color-primary-foreground: oklch(0.99 0.005 80);
+  --color-accent: oklch(0.9 0.01 80);
+  --color-accent-foreground: oklch(0.2 0.01 20);
+
+  --font-serif: "Instrument Serif", "Georgia", serif;
+  --font-sans: "Inter", "System UI", sans-serif;
+
+  --animate-fade-in: fade-in 1s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up: slide-up 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-up {
+    0% {
+      transform: translateY(40px);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-accent;
+  }
+
+  html,
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply tracking-tight font-serif;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
