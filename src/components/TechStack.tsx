@@ -21,7 +21,7 @@ const TechStack = () => {
                 <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    className="text-7xl md:text-[10vw] font-serif leading-none italic"
+                    className="text-7xl md:text-[10vw] font-serif leading-none italic text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/50"
                 >
                     Modern <br /> Architectures.
                 </motion.h2>
@@ -53,10 +53,10 @@ const Marquee = ({ items, speed, reverse = false }: MarqueeProps) => {
             >
                 {[...items, ...items, ...items].map((item, i) => (
                     <div key={i} className="flex items-center gap-20">
-                        <span className="text-5xl md:text-[8vw] font-serif text-foreground/10 hover:text-primary transition-all duration-700 cursor-default hover:italic hover:opacity-100">
+                        <span className="text-5xl md:text-[8vw] font-serif text-foreground/40 hover:text-foreground transition-all duration-700 cursor-default hover:italic">
                             {item}
                         </span>
-                        <div className="w-4 h-4 rounded-full bg-primary/20 rotate-45" />
+                        <div className="w-4 h-4 rounded-full bg-foreground/20 rotate-45" />
                     </div>
                 ))}
             </motion.div>

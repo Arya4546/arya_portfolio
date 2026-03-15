@@ -24,7 +24,7 @@ const About = () => {
                     >
                         <span className="text-xs uppercase tracking-[0.4em] text-foreground/40 mb-6 md:mb-8 block font-mono italic">the narrative — 01</span>
                         <h2 className="text-5xl md:text-[6.5vw] mb-8 md:mb-12 leading-[1] font-serif">
-                            A journey through <br /> <span className="italic font-light">pixels & logic.</span>
+                            A journey through <br /> <span className="italic font-light text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/50">pixels & logic.</span>
                         </h2>
                         <div className="space-y-6 md:space-y-8 text-base md:text-xl text-foreground/70 leading-relaxed">
                             <p>

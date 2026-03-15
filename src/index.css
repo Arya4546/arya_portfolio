@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: oklch(0.99 0.005 80);
-  --color-foreground: oklch(0.2 0.01 20);
-  --color-primary: oklch(0.35 0.06 142);
-  /* Deep Fern Green */
-  --color-primary-foreground: oklch(0.99 0.005 80);
-  --color-accent: oklch(0.9 0.01 80);
-  --color-accent-foreground: oklch(0.2 0.01 20);
+  /* Cinematic Monochromatic Light Theme */
+  --color-background: oklch(0.99 0 0);
+  --color-foreground: oklch(0.15 0 0);
+  --color-primary: oklch(0.15 0 0);
+  --color-primary-foreground: oklch(0.99 0 0);
+  --color-accent: oklch(0.93 0 0);
+  --color-accent-foreground: oklch(0.15 0 0);
 
   --font-serif: "Instrument Serif", "Georgia", serif;
   --font-sans: "Inter", "System UI", sans-serif;
@@ -38,6 +38,16 @@
   }
 }
 
+:root.dark, .dark {
+  /* Cinematic Monochromatic Dark Theme */
+  --color-background: oklch(0.12 0 0);
+  --color-foreground: oklch(0.98 0 0);
+  --color-primary: oklch(0.98 0 0);
+  --color-primary-foreground: oklch(0.12 0 0);
+  --color-accent: oklch(0.20 0 0);
+  --color-accent-foreground: oklch(0.98 0 0);
+}
+
 @layer base {
   * {
     @apply border-accent;
@@ -48,6 +58,7 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
     scroll-behavior: smooth;
+    @apply bg-background text-foreground;
   }
 
   body::-webkit-scrollbar {
@@ -61,6 +72,14 @@
   h3 {
     @apply tracking-tight font-serif;
   }
+}
+
+.custom-cursor-active {
+  cursor: none !important;
+}
+
+.custom-cursor-active * {
+  cursor: none !important;
 }
 
 .no-scrollbar::-webkit-scrollbar {

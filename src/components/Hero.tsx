@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import HeroVisuals from './HeroVisuals';
+import Magnetic from './Magnetic';
 
 const Hero = () => {
     return (
@@ -26,7 +27,7 @@ const Hero = () => {
                         <span className="text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground/40 mb-4 lg:mb-6 leading-relaxed">
                             Available for Freelance & Internships • 1+ Year Exp.
                         </span>
-                        <h1 className="text-[14vw] md:text-[8vw] lg:text-[7rem] leading-[1] md:leading-[0.9] font-serif mb-4 lg:mb-8 italic whitespace-nowrap">
+                        <h1 className="text-[14vw] md:text-[8vw] lg:text-[7rem] leading-[1] md:leading-[0.9] font-serif mb-4 lg:mb-8 italic whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/50 pb-2 lg:pb-4">
                             Arya <br /> Deep Singh
                         </h1>
                         <div className="flex flex-col w-full gap-6 lg:gap-8">
@@ -36,19 +37,21 @@ const Hero = () => {
                                 and robust engineering.
                             </p>
                             <div>
-                                <motion.button
-                                    whileHover={{
-                                        scale: 1.02,
-                                        boxShadow: "0 0 40px rgba(53, 102, 60, 0.2)"
-                                    }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className="px-6 py-4 lg:px-8 lg:py-5 bg-foreground text-background rounded-full font-medium text-base lg:text-lg flex items-center gap-4 group transition-colors hover:bg-primary/90 inline-flex"
-                                >
-                                    View Projects
-                                    <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-background flex items-center justify-center group-hover:rotate-[135deg] transition-transform duration-500">
-                                        <ArrowDown size={18} className="text-foreground" />
-                                    </div>
-                                </motion.button>
+                                <Magnetic intensity={0.2}>
+                                    <motion.button
+                                        whileHover={{
+                                            scale: 1.02,
+                                            boxShadow: "0 0 40px rgba(53, 102, 60, 0.2)"
+                                        }}
+                                        whileTap={{ scale: 0.98 }}
+                                        className="px-6 py-4 lg:px-8 lg:py-5 bg-foreground text-background rounded-full font-medium text-base lg:text-lg flex items-center gap-4 group transition-colors hover:bg-primary/90 inline-flex"
+                                    >
+                                        View Projects
+                                        <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-background flex items-center justify-center group-hover:rotate-[135deg] transition-transform duration-500">
+                                            <ArrowDown size={18} className="text-foreground" />
+                                        </div>
+                                    </motion.button>
+                                </Magnetic>
                             </div>
                         </div>
                     </motion.div>

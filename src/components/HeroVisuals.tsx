@@ -30,7 +30,6 @@ const HeroVisuals = () => {
                 </div>
             </div>
 
-            {/* Code Body */}
             <div className="p-4 md:p-6 lg:p-8 font-mono text-[11px] md:text-sm lg:text-base leading-relaxed text-foreground/80 overflow-x-auto">
                 {codeLines.map((line, i) => (
                     <motion.div
@@ -45,8 +44,8 @@ const HeroVisuals = () => {
                             <span>&nbsp;</span>
                         ) : (
                             <>
-                                <span className="text-primary">{line.substring(0, line.indexOf(' ') > 0 ? line.indexOf(' ') : line.length)}</span>
-                                <span>{line.substring(line.indexOf(' ') > 0 ? line.indexOf(' ') : line.length)}</span>
+                                <span className="text-foreground">{line.substring(0, line.indexOf(' ') > 0 ? line.indexOf(' ') : line.length)}</span>
+                                <span className="text-foreground/70">{line.substring(line.indexOf(' ') > 0 ? line.indexOf(' ') : line.length)}</span>
                             </>
                         )}
                     </motion.div>
@@ -54,7 +53,7 @@ const HeroVisuals = () => {
             </div>
 
             {/* Decorative Subtle Glow */}
-            <div className="absolute -z-10 -bottom-20 -right-20 w-64 h-64 bg-primary/20 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute -z-10 -bottom-20 -right-20 w-64 h-64 bg-foreground/5 rounded-full blur-[80px] pointer-events-none" />
         </motion.div>
     );
 };

@@ -31,7 +31,7 @@ const Services = () => {
             <div className="max-w-7xl mx-auto">
                 <div className="mb-20 md:mb-32">
                     <span className="text-xs uppercase tracking-[0.4em] text-foreground/40 mb-4 md:mb-6 block">Areas of Mastery</span>
-                    <h2 className="text-5xl md:text-[8vw] leading-[1] font-serif italic">Expertise.</h2>
+                    <h2 className="text-5xl md:text-[8vw] leading-[1] font-serif italic text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/50">Expertise.</h2>
                 </div>
 
                 <div className="flex flex-col gap-8 md:gap-12 relative">

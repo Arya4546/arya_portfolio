@@ -52,19 +52,19 @@ const Projects = () => {
     const x = useTransform(scrollYProgress, [0, 1], ["0%", "-80%"]);
 
     return (
-        <section ref={targetRef} className="relative h-[500vh] bg-foreground text-background">
+        <section ref={targetRef} className="relative h-[500vh] bg-background text-foreground shrink-0 border-t border-foreground/5">
             <div className="sticky top-0 h-screen flex items-center overflow-hidden">
                 <motion.div style={{ x }} className="flex gap-8 md:gap-12 px-6 md:px-24">
                     <div className="flex flex-col justify-center min-w-[70vw] md:min-w-[50vw]">
                         <span className="text-xs uppercase tracking-[0.4em] text-accent/60 mb-6 md:mb-8 block">Selected Work</span>
-                        <h2 className="text-5xl md:text-[8vw] leading-tight mb-8">Visionary <br /> Ventures.</h2>
+                        <h2 className="text-5xl md:text-[8vw] leading-tight mb-8 text-transparent bg-clip-text bg-gradient-to-br from-foreground to-foreground/50">Visionary <br /> Ventures.</h2>
                     </div>
                     {projects.map((project, index) => (
                         <motion.div
                             key={index}
-                            className="min-w-[85vw] md:min-w-[45vw] h-[60vh] md:h-[75vh] group relative rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-black border border-foreground/5 cursor-pointer"
+                            className="min-w-[85vw] md:min-w-[45vw] h-[60vh] md:h-[75vh] group relative rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-background border border-foreground/5 cursor-pointer"
                         >
-                            <div className="absolute inset-0 bg-black overflow-hidden">
+                            <div className="absolute inset-0 bg-background overflow-hidden">
                                 <img
                                     src={project.image}
                                     alt={project.title}
@@ -72,13 +72,13 @@ const Projects = () => {
                                 />
                             </div>
 
-                            {/* Subtle overlay to ensure text is always readable over images */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                            {/* Subtle overlay to ensure text is always readable over images dynamically */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent pointer-events-none" />
 
                             {/* View Badge */}
                             <div className="absolute top-12 right-12 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden md:block">
-                                <div className="w-24 h-24 rounded-full border border-primary/30 flex items-center justify-center backdrop-blur-md bg-black/20 animate-pulse">
-                                    <span className="text-[10px] uppercase tracking-widest text-primary font-bold">View Case</span>
+                                <div className="w-24 h-24 rounded-full border border-foreground/30 flex items-center justify-center backdrop-blur-md bg-foreground/5 animate-pulse">
+                                    <span className="text-[10px] uppercase tracking-widest text-foreground font-bold">View Case</span>
                                 </div>
                             </div>
 
@@ -89,10 +89,10 @@ const Projects = () => {
                                         <h4 className="text-3xl md:text-5xl font-serif">{project.title}</h4>
                                     </div>
                                     <div className="flex gap-3 md:gap-4">
-                                        <a href="#" className="p-2 md:p-3 bg-primary text-primary-foreground rounded-full hover:scale-110 transition-transform">
+                                        <a href="#" aria-label={`View ${project.title} on GitHub`} className="p-2 md:p-3 bg-primary text-primary-foreground rounded-full hover:scale-110 transition-transform">
                                             <Github size={18} />
                                         </a>
-                                        <a href="#" className="p-2 md:p-3 bg-foreground text-background rounded-full hover:scale-110 transition-transform">
+                                        <a href="#" aria-label={`Visit ${project.title} website`} className="p-2 md:p-3 bg-foreground text-background rounded-full hover:scale-110 transition-transform">
                                             <ExternalLink size={18} />
                                         </a>
                                     </div>
@@ -100,7 +100,7 @@ const Projects = () => {
                                 <p className="text-base md:text-lg text-foreground/70 italic mb-4 md:mb-6 max-w-sm">{project.description}</p>
                                 <div className="flex flex-wrap gap-3 md:gap-4">
                                     {project.stack.map((tech, i) => (
-                                        <span key={i} className="text-[9px] md:text-[10px] tracking-widest uppercase border-b border-primary/40 pb-1">{tech}</span>
+                                        <span key={i} className="text-[9px] md:text-[10px] tracking-widest uppercase border-b border-foreground/40 pb-1">{tech}</span>
                                     ))}
                                 </div>
                             </div>

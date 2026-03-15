@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import Lenis from 'lenis';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import Preloader from './components/Preloader';
+import CustomCursor from './components/CustomCursor';
 import About from './components/About';
 import Services from './components/Services';
 import Projects from './components/Projects';
@@ -15,6 +17,8 @@ function App() {
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      syncTouch: false,
+      touchMultiplier: 1,
     });
 
     function raf(time: number) {
@@ -30,7 +34,9 @@ function App() {
   }, []);
 
   return (
-    <main className="bg-background selection:bg-primary selection:text-primary-foreground">
+    <main className="bg-background text-foreground selection:bg-primary selection:text-primary-foreground transition-colors duration-700">
+      <Preloader />
+      <CustomCursor />
       <Navbar />
       <Hero />
 

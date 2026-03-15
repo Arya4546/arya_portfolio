@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
+import { Moon, Sun } from 'lucide-react';
 
 const navLinks = [
     { name: 'About', href: '#about' },
@@ -13,6 +14,13 @@ const navLinks = [
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [isDark, setIsDark] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('theme') === 'dark' || 
+                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        }
+        return false;
+    });
 
     useEffect(() => {
         const handleScroll = () => {
@@ -21,6 +29,16 @@ const Navbar = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    useEffect(() => {
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    }, [isDark]);
 
     const menuVariants: Variants = {
         closed: {
@@ -79,20 +97,33 @@ const Navbar = () => {
                         ))}
                     </div>
 
-                    {/* Hamburger (Mobile Only) */}
-                    <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className="md:hidden flex flex-col gap-2 p-4 z-[110] relative"
-                    >
-                        <motion.span
-                            animate={isOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
-                            className="w-8 h-[2px] bg-foreground block rounded-full origin-center transition-color duration-300"
-                        />
-                        <motion.span
-                            animate={isOpen ? { rotate: -45, y: -5 } : { rotate: 0, y: 0 }}
-                            className="w-8 h-[2px] bg-foreground block rounded-full origin-center transition-color duration-300"
-                        />
-                    </button>
+                    <div className="flex items-center gap-4 md:gap-8 z-[110]">
+                        <button 
+                            onClick={() => setIsDark(!isDark)}
+                            className="p-2 hover:bg-foreground/5 rounded-full transition-colors"
+                            aria-label="Toggle dark mode"
+                        >
+                            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
+
+                        {/* Hamburger (Mobile Only) */}
+                        <button
+                            onClick={() => setIsOpen(!isOpen)}
+                            className="md:hidden flex flex-col gap-2 p-2 relative"
+                            aria-expanded={isOpen}
+                            aria-label="Toggle navigation menu"
+                            aria-controls="mobile-menu"
+                        >
+                            <motion.span
+                                animate={isOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
+                                className="w-8 h-[2px] bg-foreground block rounded-full origin-center transition-colors duration-300"
+                            />
+                            <motion.span
+                                animate={isOpen ? { rotate: -45, y: -5 } : { rotate: 0, y: 0 }}
+                                className="w-8 h-[2px] bg-foreground block rounded-full origin-center transition-colors duration-300"
+                            />
+                        </button>
+                    </div>
                 </div>
             </nav>
 
@@ -100,6 +131,7 @@ const Navbar = () => {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
+                        id="mobile-menu"
                         variants={menuVariants}
                         initial="closed"
                         animate="open"
