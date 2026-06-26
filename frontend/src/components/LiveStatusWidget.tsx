@@ -114,6 +114,7 @@ export default function LiveStatusWidget() {
   const [activity, setActivity] = useState<ActivityData | null>(null);
   const [loading, setLoading] = useState(true);
   const [, setTick] = useState(0);
+  const hasReceivedData = { current: false };
 
   const fetchActivity = useCallback(async () => {
     try {
@@ -121,15 +122,17 @@ export default function LiveStatusWidget() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: ActivityData = await res.json();
       setActivity(data);
+      hasReceivedData.current = true;
     } catch {
-      // Fail silently — keep last known state
-      if (!activity) {
+      // Fail silently — show offline fallback only if we never got data
+      if (!hasReceivedData.current) {
         setActivity({ statusLabel: 'Offline', icon: null, appName: null, startedAt: null });
       }
     } finally {
       setLoading(false);
     }
-  }, [activity]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Poll the API
   useEffect(() => {
