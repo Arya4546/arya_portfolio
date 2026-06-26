@@ -20,6 +20,11 @@ interface ActivityData {
   startedAt: string | null;
 }
 
+interface StatusTextStructure {
+  verb: string;
+  noun?: string;
+}
+
 /* ─── Config ───────────────────────────────────────────────── */
 
 const API_URL = import.meta.env.VITE_ACTIVITY_API_URL || 'http://localhost:4000/api/activity';
@@ -89,8 +94,69 @@ function timeAgo(dateString: string | null): string {
   return 'a while ago';
 }
 
-function getStatusIcon(statusLabel: string): ComponentType<LucideProps> {
-  return ICON_MAP[statusLabel] ?? CloudOff;
+function formatStatusText(statusLabel: string, appName: string | null): StatusTextStructure {
+  switch (statusLabel) {
+    case 'Coding':
+      return { verb: 'Currently coding', noun: appName ? `in ${appName}` : '' };
+    case 'Debugging':
+      return { verb: 'Currently debugging', noun: appName ? `in ${appName}` : '' };
+    case 'Designing':
+      return { verb: 'Currently designing', noun: appName ? `in ${appName}` : '' };
+    case 'Writing':
+      return { verb: 'Currently writing', noun: appName ? `in ${appName}` : '' };
+    case 'In a Meeting':
+      return { verb: 'Currently in a meeting' };
+    case 'On a Call':
+      return { verb: 'Currently on a call' };
+    case 'Reviewing Code':
+      return { verb: 'Currently reviewing code' };
+    case 'Studying':
+      return { verb: 'Currently studying' };
+    case 'Reading':
+      return { verb: 'Currently reading' };
+    case 'Listening to Music':
+      return { verb: 'Currently listening', noun: 'to music' };
+    case 'Watching Movies':
+      return { verb: 'Currently watching', noun: appName ? `on ${appName}` : 'a movie' };
+    case 'Gaming':
+      return { verb: 'Currently gaming', noun: appName ? `on ${appName}` : 'games' };
+    case 'Scrolling Reels':
+      return { verb: 'Currently scrolling', noun: appName ? `on ${appName}` : 'reels' };
+    case 'Browsing':
+      return { verb: 'Currently browsing' };
+    case 'Streaming':
+      return { verb: 'Currently streaming' };
+    case 'Photography':
+      return { verb: 'Currently shooting photos' };
+    case 'Driving':
+      return { verb: 'Currently driving' };
+    case 'Traveling':
+      return { verb: 'Currently traveling' };
+    case 'Walking':
+      return { verb: 'Currently walking' };
+    case 'Working Out':
+      return { verb: 'Currently working out' };
+    case 'Commuting':
+      return { verb: 'Currently commuting' };
+    case 'Cycling':
+      return { verb: 'Currently cycling' };
+    case 'Ordering Food':
+      return { verb: 'Currently ordering food', noun: appName ? `on ${appName}` : '' };
+    case 'Coffee Break':
+      return { verb: 'Currently on a coffee break' };
+    case 'Cooking':
+      return { verb: 'Currently cooking' };
+    case 'Shopping Online':
+      return { verb: 'Currently shopping online' };
+    case 'At a Restaurant':
+      return { verb: 'Currently at a restaurant' };
+    case 'Sleeping':
+      return { verb: 'Currently sleeping' };
+    case 'Meditating':
+      return { verb: 'Currently meditating' };
+    default:
+      return { verb: 'Currently offline' };
+  }
 }
 
 /* ─── Pulse Dot ────────────────────────────────────────────── */
@@ -124,7 +190,6 @@ export default function LiveStatusWidget() {
       setActivity(data);
       hasReceivedData.current = true;
     } catch {
-      // Fail silently — show offline fallback only if we never got data
       if (!hasReceivedData.current) {
         setActivity({ statusLabel: 'Offline', icon: null, appName: null, startedAt: null });
       }
@@ -134,14 +199,12 @@ export default function LiveStatusWidget() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Poll the API
   useEffect(() => {
     fetchActivity();
     const interval = setInterval(fetchActivity, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [fetchActivity]);
 
-  // Update the "X min ago" text periodically
   useEffect(() => {
     const timer = setInterval(() => setTick((t) => t + 1), TIME_UPDATE_MS);
     return () => clearInterval(timer);
@@ -149,111 +212,73 @@ export default function LiveStatusWidget() {
 
   const isOffline = activity?.statusLabel === 'Offline';
   const StatusIcon = useMemo(
-    () => getStatusIcon(activity?.statusLabel ?? 'Offline'),
+    () => ICON_MAP[activity?.statusLabel ?? 'Offline'] ?? CloudOff,
     [activity?.statusLabel]
+  );
+  const statusParts = useMemo(
+    () => formatStatusText(activity?.statusLabel ?? 'Offline', activity?.appName ?? null),
+    [activity?.statusLabel, activity?.appName]
   );
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-      className={`w-full max-w-md rounded-2xl border transition-all duration-300 relative overflow-hidden backdrop-blur-xl ${
-        isOffline
-          ? 'border-foreground/10 bg-accent/5 shadow-sm border-l-[6px] border-l-foreground/20'
-          : 'border-foreground/10 bg-accent/5 shadow-md border-l-[6px] border-l-emerald-500'
-      }`}
+      transition={{ duration: 0.8, delay: 0.2 }}
+      className="flex flex-col items-start gap-1.5"
     >
-      <div className="flex items-center justify-between gap-4 p-4 sm:p-5">
-        {/* Left Side: Icon + Activity details */}
-        <div className="flex items-center gap-4 min-w-0">
-          {/* Status Icon */}
-          <div
-            className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
-              isOffline
-                ? 'bg-foreground/[0.04] border-foreground/5 text-foreground/40'
-                : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 dark:text-emerald-400'
-            }`}
-          >
-            <AnimatePresence mode="wait">
-              {loading ? (
-                <motion.div
-                  key="loading"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-                  className="w-3.5 h-3.5 border border-foreground/20 border-t-foreground/60 rounded-full"
-                />
-              ) : (
-                <motion.div
-                  key={activity?.statusLabel ?? 'offline'}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.8, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <StatusIcon size={20} strokeWidth={1.5} />
-                </motion.div>
+      {/* Small live badge row */}
+      <div className="flex items-center gap-2">
+        <PulseDot isOffline={isOffline} />
+        <span
+          className={`text-[9px] uppercase tracking-[0.25em] font-bold font-mono ${
+            isOffline ? 'text-foreground/30' : 'text-emerald-500/90'
+          }`}
+        >
+          {isOffline ? 'Offline Status' : 'Live Status'}
+        </span>
+        {/* Time Ago (Only when live) */}
+        {!loading && !isOffline && activity?.startedAt && (
+          <span className="text-[9px] text-foreground/30 font-mono tracking-normal lowercase">
+            ({timeAgo(activity.startedAt)})
+          </span>
+        )}
+      </div>
+
+      {/* Main statement with beautiful serif italic typography */}
+      <div className="flex items-baseline flex-wrap gap-x-2">
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.span
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-base sm:text-lg font-mono text-foreground/30"
+            >
+              checking activity...
+            </motion.span>
+          ) : (
+            <motion.div
+              key={activity?.statusLabel ?? 'offline'}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="flex items-center flex-wrap gap-x-2 text-foreground/70"
+            >
+              <StatusIcon size={14} strokeWidth={1.5} className="shrink-0 text-foreground/50 mr-0.5" />
+              <h3 className="text-lg sm:text-xl font-serif italic text-foreground leading-tight">
+                {statusParts.verb}
+              </h3>
+              {statusParts.noun && (
+                <span className="text-sm sm:text-base font-sans font-normal text-foreground/50 leading-tight">
+                  {statusParts.noun}
+                </span>
               )}
-            </AnimatePresence>
-          </div>
-
-          {/* Details */}
-          <div className="min-w-0 flex flex-col">
-            <span className="text-[9px] uppercase tracking-[0.2em] font-extrabold text-foreground/45 font-mono mb-0.5">
-              Live Activity
-            </span>
-            <AnimatePresence mode="wait">
-              {loading ? (
-                <motion.span
-                  key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-xs text-foreground/30 font-mono"
-                >
-                  checking status...
-                </motion.span>
-              ) : (
-                <motion.div
-                  key={activity?.statusLabel ?? 'offline'}
-                  initial={{ opacity: 0, y: 3 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -3 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex flex-col min-w-0"
-                >
-                  <span className="text-xs sm:text-sm font-bold text-foreground truncate leading-tight">
-                    {activity?.statusLabel ?? 'Offline'}
-                  </span>
-                  {activity?.appName && (
-                    <span className="text-[10px] text-foreground/40 font-mono mt-0.5 truncate">
-                      using {activity.appName}
-                    </span>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-
-        {/* Right Side: Badge & Time */}
-        <div className="flex flex-col items-end shrink-0 gap-1.5">
-          <div
-            className={`px-2.5 py-1 rounded-full text-[9px] font-bold tracking-wider uppercase border flex items-center gap-1.5 ${
-              isOffline
-                ? 'bg-foreground/[0.04] text-foreground/40 border-foreground/10'
-                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-            }`}
-          >
-            <PulseDot isOffline={isOffline} />
-            {isOffline ? 'Away' : 'Live'}
-          </div>
-
-          {!loading && activity?.startedAt && (
-            <span className="text-[9px] text-foreground/35 font-mono">
-              {timeAgo(activity.startedAt)}
-            </span>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </div>
     </motion.div>
   );
