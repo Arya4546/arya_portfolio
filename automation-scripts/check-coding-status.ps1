@@ -23,12 +23,50 @@ try {
     # Ignore and proceed
 }
 
+# Define C# Type to get active window title on Windows
+$winApiCode = @"
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
+public class ActiveWindow {
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")]
+    public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+}
+"@
+
+try {
+    Add-Type -TypeDefinition $winApiCode -ErrorAction SilentlyContinue
+} catch {
+    # Ignore if already loaded
+}
+
+# Fetch active window title
+$activeTitle = ""
+try {
+    $hWnd = [ActiveWindow]::GetForegroundWindow()
+    $title = New-Object System.Text.StringBuilder 256
+    $null = [ActiveWindow]::GetWindowText($hWnd, $title, 256)
+    $activeTitle = $title.ToString()
+} catch {
+    # Fail silently
+}
+
 # Check processes
 $codeRunning = Get-Process -Name "Code" -ErrorAction SilentlyContinue
 $cursorRunning = Get-Process -Name "Cursor" -ErrorAction SilentlyContinue
 
 if ($codeRunning -or $cursorRunning) {
+    # Determine default editor name
     $appName = if ($cursorRunning) { "Cursor" } else { "VS Code" }
+
+    # If the active window title contains editor name, inspect for Antigravity workspace
+    if ($activeTitle -like "*Visual Studio Code*" -or $activeTitle -like "*Cursor*") {
+        if ($activeTitle -like "*arya_portfolio*" -or $activeTitle -like "*antigravity*") {
+            $appName = "Antigravity"
+        }
+    }
     
     $body = @{
         statusLabel = "Coding"

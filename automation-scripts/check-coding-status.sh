@@ -39,11 +39,25 @@ if command -v xdotool &> /dev/null; then
     ACTIVE_WINDOW_NAME=$(xdotool getwindowname "$ACTIVE_WINDOW_ID" 2>/dev/null)
     
     # Check if window title matches coding apps or terminal
-    if [[ "$ACTIVE_WINDOW_NAME" == *"Visual Studio Code"* || "$ACTIVE_WINDOW_NAME" == *"Cursor"* || "$ACTIVE_WINDOW_NAME" == *"Code - OSS"* ]]; then
+    if [[ "$ACTIVE_WINDOW_NAME" == *"Visual Studio Code"* || "$ACTIVE_WINDOW_NAME" == *"Code - OSS"* ]]; then
+      APP_NAME="VS Code"
+      if [[ "$ACTIVE_WINDOW_NAME" == *"arya_portfolio"* || "$ACTIVE_WINDOW_NAME" == *"antigravity"* ]]; then
+        APP_NAME="Antigravity"
+      fi
       curl -s -X POST "$API_URL" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $SECRET" \
-        -d '{"statusLabel": "Coding", "appName": "VS Code", "icon": "Coding"}' > /dev/null
+        -d "{\"statusLabel\": \"Coding\", \"appName\": \"$APP_NAME\", \"icon\": \"Coding\"}" > /dev/null
+      IS_CODING=true
+    elif [[ "$ACTIVE_WINDOW_NAME" == *"Cursor"* ]]; then
+      APP_NAME="Cursor"
+      if [[ "$ACTIVE_WINDOW_NAME" == *"arya_portfolio"* || "$ACTIVE_WINDOW_NAME" == *"antigravity"* ]]; then
+        APP_NAME="Antigravity"
+      fi
+      curl -s -X POST "$API_URL" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $SECRET" \
+        -d "{\"statusLabel\": \"Coding\", \"appName\": \"$APP_NAME\", \"icon\": \"Coding\"}" > /dev/null
       IS_CODING=true
     elif [[ "$ACTIVE_WINDOW_NAME" == *"Debugging"* ]]; then
       curl -s -X POST "$API_URL" \
@@ -57,7 +71,13 @@ fi
 
 # 2. Fallback: Process check (works on Wayland too if xdotool fails)
 if [ "$IS_CODING" = false ]; then
-  if pgrep -x "code" > /dev/null || pgrep -x "cursor-bin" > /dev/null || pgrep -x "cursor" > /dev/null; then
+  if pgrep -x "cursor" > /dev/null || pgrep -x "cursor-bin" > /dev/null; then
+    curl -s -X POST "$API_URL" \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $SECRET" \
+      -d '{"statusLabel": "Coding", "appName": "Cursor", "icon": "Coding"}' > /dev/null
+    IS_CODING=true
+  elif pgrep -x "code" > /dev/null; then
     curl -s -X POST "$API_URL" \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer $SECRET" \

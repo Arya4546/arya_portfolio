@@ -19,6 +19,7 @@ const ALLOWED_STATUSES = new Set([
   // Learning
   'Studying',
   'Reading',
+  'Researching',
 
   // Entertainment
   'Listening to Music',

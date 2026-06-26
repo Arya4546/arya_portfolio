@@ -2,11 +2,11 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Terminal, Bug, Palette, PenTool, GraduationCap, BookOpen,
-  Car, Plane, Footprints, Dumbbell, Bike,
-  Headphones, Film, Gamepad2, Smartphone, Globe, Camera, Radio,
+  Car, Plane, Footprints, Dumbbell, Bike, Film, Gamepad2, Smartphone, Globe, Camera, Radio,
   ShoppingBag, UtensilsCrossed, Coffee, CookingPot,
   Users, Phone, GitPullRequest,
   Moon, CloudOff, Brain, Train,
+  Music, Search,
   type LucideProps,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
@@ -46,9 +46,10 @@ const ICON_MAP: Record<string, ComponentType<LucideProps>> = {
   // Learning
   'Studying':          GraduationCap,
   'Reading':           BookOpen,
+  'Researching':       Search,
 
   // Entertainment
-  'Listening to Music': Headphones,
+  'Listening to Music': Music,
   'Watching Movies':   Film,
   'Gaming':            Gamepad2,
   'Scrolling Reels':   Smartphone,
@@ -105,17 +106,19 @@ function formatStatusText(statusLabel: string, appName: string | null): StatusTe
     case 'Writing':
       return { verb: 'Currently writing', noun: appName ? `in ${appName}` : '' };
     case 'In a Meeting':
-      return { verb: 'Currently in a meeting' };
+      return { verb: 'Currently in a meeting', noun: appName ? `on ${appName}` : '' };
     case 'On a Call':
-      return { verb: 'Currently on a call' };
+      return { verb: 'Currently on a call', noun: appName ? `via ${appName}` : '' };
     case 'Reviewing Code':
       return { verb: 'Currently reviewing code' };
     case 'Studying':
       return { verb: 'Currently studying' };
     case 'Reading':
       return { verb: 'Currently reading' };
+    case 'Researching':
+      return { verb: 'Currently researching', noun: appName ? `using ${appName}` : '' };
     case 'Listening to Music':
-      return { verb: 'Currently listening', noun: 'to music' };
+      return { verb: 'Currently listening', noun: appName ? `to music on ${appName}` : 'to music' };
     case 'Watching Movies':
       return { verb: 'Currently watching', noun: appName ? `on ${appName}` : 'a movie' };
     case 'Gaming':
@@ -123,7 +126,7 @@ function formatStatusText(statusLabel: string, appName: string | null): StatusTe
     case 'Scrolling Reels':
       return { verb: 'Currently scrolling', noun: appName ? `on ${appName}` : 'reels' };
     case 'Browsing':
-      return { verb: 'Currently browsing' };
+      return { verb: 'Currently browsing', noun: appName ? `on ${appName}` : '' };
     case 'Streaming':
       return { verb: 'Currently streaming' };
     case 'Photography':
@@ -147,7 +150,7 @@ function formatStatusText(statusLabel: string, appName: string | null): StatusTe
     case 'Cooking':
       return { verb: 'Currently cooking' };
     case 'Shopping Online':
-      return { verb: 'Currently shopping online' };
+      return { verb: 'Currently shopping online', noun: appName ? `on ${appName}` : '' };
     case 'At a Restaurant':
       return { verb: 'Currently at a restaurant' };
     case 'Sleeping':
