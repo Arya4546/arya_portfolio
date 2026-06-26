@@ -10,7 +10,7 @@
 # ──────────────────────────────────────────────────────────────────────
 
 # Configuration
-API_URL="http://localhost:4000/api/activity" # Update with your live Render URL when deployed
+API_URL="https://arya-portfolio-ag4w.onrender.com/api/activity"
 SECRET="7d6e8ea7f6c12a8a90dbaa3e4cc2373b07ee4e81c7f77a8dc652a282d94fb18e"
 
 # Fetch current status from API
