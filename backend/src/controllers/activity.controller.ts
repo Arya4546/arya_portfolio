@@ -63,7 +63,12 @@ export const setActivity = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    if (!ALLOWED_STATUSES.has(statusLabel)) {
+    // Case-insensitive match and normalization
+    const normalizedStatus = Array.from(ALLOWED_STATUSES).find(
+      (status) => status.toLowerCase() === statusLabel.toLowerCase()
+    );
+
+    if (!normalizedStatus) {
       res.status(400).json({
         error: `Unknown statusLabel: "${statusLabel}"`,
         allowed: Array.from(ALLOWED_STATUSES).sort(),
@@ -78,7 +83,7 @@ export const setActivity = async (req: Request, res: Response): Promise<void> =>
     );
 
     const created = await ActivityStatus.create({
-      statusLabel,
+      statusLabel: normalizedStatus,
       appName: appName ?? null,
       icon: icon ?? null,
       startedAt: new Date(),
