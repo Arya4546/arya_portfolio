@@ -13,7 +13,9 @@ const app = (0, express_1.default)();
 // ── Middleware ──────────────────────────────────────────────
 app.use(express_1.default.json({ limit: '1kb' }));
 app.use((0, cors_1.default)({
-    origin: env_1.env.ALLOWED_ORIGIN,
+    origin: env_1.env.ALLOWED_ORIGIN.includes(',')
+        ? env_1.env.ALLOWED_ORIGIN.split(',').map(o => o.trim())
+        : env_1.env.ALLOWED_ORIGIN,
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));

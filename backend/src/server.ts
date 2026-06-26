@@ -12,7 +12,9 @@ app.use(express.json({ limit: '1kb' }));
 
 app.use(
   cors({
-    origin: env.ALLOWED_ORIGIN,
+    origin: env.ALLOWED_ORIGIN.includes(',') 
+      ? env.ALLOWED_ORIGIN.split(',').map(o => o.trim()) 
+      : env.ALLOWED_ORIGIN,
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
