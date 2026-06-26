@@ -30,6 +30,11 @@ fi
 # Fetch current status from API
 CURRENT_STATUS=$(curl -s "$API_URL" | python3 -c "import sys, json; print(json.load(sys.stdin).get('statusLabel', ''))" 2>/dev/null)
 
+# If current status is a high-priority manual/real-time status, do not overwrite it.
+if [[ -n "$CURRENT_STATUS" && "$CURRENT_STATUS" != "Coding" && "$CURRENT_STATUS" != "Debugging" && "$CURRENT_STATUS" != "Offline" ]]; then
+  exit 0
+fi
+
 IS_CODING=false
 
 # 1. Try X11 active window detection (most accurate for desktop)

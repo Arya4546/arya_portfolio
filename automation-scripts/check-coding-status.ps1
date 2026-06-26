@@ -23,6 +23,11 @@ try {
     # Ignore and proceed
 }
 
+# If current status is a high-priority manual/real-time status, exit and do not overwrite
+if ($currentStatus -and $currentStatus -ne "Coding" -and $currentStatus -ne "Debugging" -and $currentStatus -ne "Offline") {
+    Exit
+}
+
 # Define C# Type to get active window title on Windows
 $winApiCode = @"
 using System;
