@@ -2,10 +2,11 @@ import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import HeroVisuals from './HeroVisuals';
 import Magnetic from './Magnetic';
+import LiveStatusWidget from './LiveStatusWidget';
 
 const Hero = () => {
     return (
-        <section className="fixed inset-0 h-[100dvh] flex items-center justify-center overflow-hidden bg-background pt-32 lg:pt-0 pb-20 lg:pb-0">
+        <section className="relative min-h-screen lg:fixed lg:inset-0 lg:h-[100dvh] flex items-center justify-center overflow-y-auto lg:overflow-hidden bg-background pt-32 lg:pt-0 pb-24 lg:pb-0">
             {/* Subtle background glow */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse" />
@@ -13,9 +14,9 @@ const Hero = () => {
             </div>
 
             <motion.div
-                className="container mx-auto px-6 relative z-10 w-full"
+                className="container mx-auto px-6 relative z-10 w-full py-8 lg:py-0"
             >
-                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
 
                     {/* Left side text */}
                     <motion.div
@@ -24,6 +25,11 @@ const Hero = () => {
                         transition={{ duration: 0.8 }}
                         className="lg:col-span-7 flex flex-col items-start"
                     >
+                        {/* Live Activity Status Pill Badge */}
+                        <div className="mb-5 sm:mb-6">
+                            <LiveStatusWidget />
+                        </div>
+
                         <span className="text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground/40 mb-4 lg:mb-6 leading-relaxed">
                             Available for Freelance & Internships • 1+ Year Exp.
                         </span>

@@ -155,66 +155,105 @@ export default function LiveStatusWidget() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 1.6, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full rounded-xl border border-foreground/10 bg-accent/5 backdrop-blur-md overflow-hidden"
+      transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      className={`w-full max-w-md rounded-2xl border transition-all duration-300 relative overflow-hidden backdrop-blur-xl ${
+        isOffline
+          ? 'border-foreground/10 bg-accent/5 shadow-sm border-l-[6px] border-l-foreground/20'
+          : 'border-foreground/10 bg-accent/5 shadow-md border-l-[6px] border-l-emerald-500'
+      }`}
     >
-      <div className="flex items-center gap-3 px-3 py-2.5 sm:px-4 sm:py-3">
-        {/* Pulse + Label */}
-        <div className="flex items-center gap-2 shrink-0">
-          <PulseDot isOffline={isOffline} />
-          <span
-            className={`text-[10px] uppercase tracking-[0.2em] font-semibold font-mono ${
-              isOffline ? 'text-foreground/30' : 'text-emerald-400'
+      <div className="flex items-center justify-between gap-4 p-4 sm:p-5">
+        {/* Left Side: Icon + Activity details */}
+        <div className="flex items-center gap-4 min-w-0">
+          {/* Status Icon */}
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
+              isOffline
+                ? 'bg-foreground/[0.04] border-foreground/5 text-foreground/40'
+                : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 dark:text-emerald-400'
             }`}
           >
+            <AnimatePresence mode="wait">
+              {loading ? (
+                <motion.div
+                  key="loading"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                  className="w-3.5 h-3.5 border border-foreground/20 border-t-foreground/60 rounded-full"
+                />
+              ) : (
+                <motion.div
+                  key={activity?.statusLabel ?? 'offline'}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <StatusIcon size={20} strokeWidth={1.5} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Details */}
+          <div className="min-w-0 flex flex-col">
+            <span className="text-[9px] uppercase tracking-[0.2em] font-extrabold text-foreground/45 font-mono mb-0.5">
+              Live Activity
+            </span>
+            <AnimatePresence mode="wait">
+              {loading ? (
+                <motion.span
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-xs text-foreground/30 font-mono"
+                >
+                  checking status...
+                </motion.span>
+              ) : (
+                <motion.div
+                  key={activity?.statusLabel ?? 'offline'}
+                  initial={{ opacity: 0, y: 3 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -3 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex flex-col min-w-0"
+                >
+                  <span className="text-xs sm:text-sm font-bold text-foreground truncate leading-tight">
+                    {activity?.statusLabel ?? 'Offline'}
+                  </span>
+                  {activity?.appName && (
+                    <span className="text-[10px] text-foreground/40 font-mono mt-0.5 truncate">
+                      using {activity.appName}
+                    </span>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Right Side: Badge & Time */}
+        <div className="flex flex-col items-end shrink-0 gap-1.5">
+          <div
+            className={`px-2.5 py-1 rounded-full text-[9px] font-bold tracking-wider uppercase border flex items-center gap-1.5 ${
+              isOffline
+                ? 'bg-foreground/[0.04] text-foreground/40 border-foreground/10'
+                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+            }`}
+          >
+            <PulseDot isOffline={isOffline} />
             {isOffline ? 'Away' : 'Live'}
-          </span>
+          </div>
+
+          {!loading && activity?.startedAt && (
+            <span className="text-[9px] text-foreground/35 font-mono">
+              {timeAgo(activity.startedAt)}
+            </span>
+          )}
         </div>
-
-        {/* Divider */}
-        <div className="w-px h-4 bg-foreground/10 shrink-0" />
-
-        {/* Status Content */}
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <AnimatePresence mode="wait">
-            {loading ? (
-              <motion.span
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-xs text-foreground/30 font-mono"
-              >
-                loading…
-              </motion.span>
-            ) : (
-              <motion.div
-                key={activity?.statusLabel ?? 'offline'}
-                initial={{ opacity: 0, x: 6 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -6 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-                className="flex items-center gap-2 min-w-0"
-              >
-                <div className="w-6 h-6 rounded-md bg-foreground/[0.06] flex items-center justify-center shrink-0">
-                  <StatusIcon size={13} strokeWidth={1.8} className="text-foreground/50" />
-                </div>
-                <span className="text-xs sm:text-sm font-medium text-foreground/80 font-mono truncate">
-                  {activity?.statusLabel ?? 'Offline'}
-                </span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Time ago */}
-        {!loading && activity?.startedAt && (
-          <span className="text-[10px] text-foreground/25 font-mono whitespace-nowrap shrink-0 hidden sm:block">
-            {timeAgo(activity.startedAt)}
-          </span>
-        )}
       </div>
     </motion.div>
   );
