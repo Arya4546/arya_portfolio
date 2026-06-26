@@ -13,6 +13,20 @@
 API_URL="https://arya-portfolio-ag4w.onrender.com/api/activity"
 SECRET="7d6e8ea7f6c12a8a90dbaa3e4cc2373b07ee4e81c7f77a8dc652a282d94fb18e"
 
+# Set GUI environment variables (required for xdotool when run via cron)
+if [ -z "$DISPLAY" ]; then
+  export DISPLAY=:0
+fi
+if [ -z "$XAUTHORITY" ]; then
+  # Detect active Mutter/Xwayland authority file or fallback to .Xauthority
+  DETECTED_AUTH=$(ls -t /run/user/$(id -u)/.mutter-Xwaylandauth.* 2>/dev/null | head -n 1)
+  if [ -n "$DETECTED_AUTH" ]; then
+    export XAUTHORITY="$DETECTED_AUTH"
+  else
+    export XAUTHORITY="$HOME/.Xauthority"
+  fi
+fi
+
 # Fetch current status from API
 CURRENT_STATUS=$(curl -s "$API_URL" | python3 -c "import sys, json; print(json.load(sys.stdin).get('statusLabel', ''))" 2>/dev/null)
 
