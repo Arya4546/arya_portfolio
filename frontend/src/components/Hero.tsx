@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import HeroVisuals from './HeroVisuals';
 import Magnetic from './Magnetic';
-import LiveStatusWidget from './LiveStatusWidget';
 
 const Hero = () => {
     return (
@@ -25,10 +24,7 @@ const Hero = () => {
                         transition={{ duration: 0.8 }}
                         className="lg:col-span-7 flex flex-col items-start"
                     >
-                        {/* Live Activity Status Pill Badge */}
-                        <div className="mb-5 sm:mb-6">
-                            <LiveStatusWidget />
-                        </div>
+
 
                         <span className="text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground/40 mb-4 lg:mb-6 leading-relaxed">
                             Available for Freelance & Internships • 1+ Year Exp.

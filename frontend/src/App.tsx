@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import Lenis from 'lenis';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import LiveStatusWidget from './components/LiveStatusWidget';
 import Preloader from './components/Preloader';
 import CustomCursor from './components/CustomCursor';
 import About from './components/About';
@@ -38,12 +39,13 @@ function App() {
       <Preloader />
       <CustomCursor />
       <Navbar />
+      <LiveStatusWidget />
       <Hero />
 
       {/* Main Content Sections that will overlap the fixed Hero */}
       <div className="relative z-10 pointer-events-none">
         {/* Spacer to allow Hero to be seen initially */}
-        <div className="h-screen pointer-events-none" />
+        <div className="hidden lg:block lg:h-screen pointer-events-none" />
 
         <div className="pointer-events-auto">
           <About />

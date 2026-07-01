@@ -1,14 +1,16 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Terminal, Bug, Palette, PenTool, GraduationCap, BookOpen,
   Car, Plane, Footprints, Dumbbell, Bike, Film, Gamepad2, Smartphone, Globe, Camera, Radio,
   ShoppingBag, UtensilsCrossed, Coffee, CookingPot,
   Users, Phone, GitPullRequest,
-  Moon, CloudOff, Brain, Train,
-  Music, Search,
-  type LucideProps,
+  Moon, CloudOff, Brain, Train, Search,
+  X, ExternalLink,
 } from 'lucide-react';
+import { SiSpotify, SiInstagram, SiSteam, SiDiscord, SiGooglechrome, SiNetflix, SiYoutube, SiGithub, SiFigma } from 'react-icons/si';
+import { VscVscode } from 'react-icons/vsc';
+import { FaGamepad } from 'react-icons/fa';
 import type { ComponentType } from 'react';
 
 /* ─── Types ────────────────────────────────────────────────── */
@@ -33,7 +35,7 @@ const TIME_UPDATE_MS = 30_000;
 
 /* ─── Icon Registry ────────────────────────────────────────── */
 
-const ICON_MAP: Record<string, ComponentType<LucideProps>> = {
+const ICON_MAP: Record<string, ComponentType<any>> = {
   // Development & Work
   'Coding':            Terminal,
   'Debugging':         Bug,
@@ -49,7 +51,6 @@ const ICON_MAP: Record<string, ComponentType<LucideProps>> = {
   'Researching':       Search,
 
   // Entertainment
-  'Listening to Music': Music,
   'Watching Movies':   Film,
   'Gaming':            Gamepad2,
   'Scrolling Reels':   Smartphone,
@@ -165,25 +166,62 @@ function formatStatusText(statusLabel: string, appName: string | null): StatusTe
 /* ─── Pulse Dot ────────────────────────────────────────────── */
 
 const PulseDot = ({ isOffline }: { isOffline: boolean }) => (
-  <span className="relative flex h-2 w-2 shrink-0">
+  <span className="relative flex h-2.5 w-2.5 shrink-0">
     {!isOffline && (
-      <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+      <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping" />
     )}
     <span
-      className={`relative inline-flex h-2 w-2 rounded-full ${
-        isOffline ? 'bg-foreground/20' : 'bg-emerald-400'
+      className={`relative inline-flex h-2.5 w-2.5 rounded-full ${
+        isOffline ? 'bg-white/20' : 'bg-white'
       }`}
+      style={!isOffline ? { boxShadow: '0 0 8px #FFFFFF, 0 0 16px rgba(255, 255, 255, 0.4)' } : {}}
     />
   </span>
 );
 
-/* ─── Component ────────────────────────────────────────────── */
+/* ─── Micro Visualizers ────────────────────────────────────── */
+
+const MusicVisualizer = () => (
+  <div className="flex items-end gap-[3px] h-6 px-1">
+    {[1, 2, 3, 4, 5].map((i) => (
+      <motion.span
+        key={i}
+        className="w-[3px] bg-white/90 rounded-full"
+        animate={{ height: ['4px', '22px', '8px', '18px', '4px'] }}
+        transition={{
+          duration: 1 + i * 0.12,
+          repeat: Infinity,
+          repeatType: 'reverse',
+          ease: 'easeInOut',
+        }}
+      />
+    ))}
+  </div>
+);
+
+const TerminalVisualizer = () => (
+  <div className="font-mono text-[10px] text-white/80 bg-white/5 px-3 py-2 rounded-lg border border-white/10 w-full flex items-center gap-1.5 select-none">
+    <span>$</span>
+    <span className="text-[10px] text-white/40">compiling arya_portfolio...</span>
+    <motion.span
+      animate={{ opacity: [1, 0, 1] }}
+      transition={{ duration: 1, repeat: Infinity }}
+      className="w-1.5 h-3 bg-white"
+    />
+  </div>
+);
+
+/* ─── Dynamic Island Component ─────────────────────────────── */
 
 export default function LiveStatusWidget() {
   const [activity, setActivity] = useState<ActivityData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [, setTick] = useState(0);
-  const hasReceivedData = { current: false };
+  const [state, setState] = useState<'compact' | 'medium' | 'expanded'>('compact');
+  const [scrolled, setScrolled] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const widgetRef = useRef<HTMLDivElement>(null);
+  const hasReceivedData = useRef(false);
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchActivity = useCallback(async () => {
     try {
@@ -196,10 +234,7 @@ export default function LiveStatusWidget() {
       if (!hasReceivedData.current) {
         setActivity({ statusLabel: 'Offline', icon: null, appName: null, startedAt: null });
       }
-    } finally {
-      setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -213,76 +248,316 @@ export default function LiveStatusWidget() {
     return () => clearInterval(timer);
   }, []);
 
-  const isOffline = activity?.statusLabel === 'Offline';
-  const StatusIcon = useMemo(
-    () => ICON_MAP[activity?.statusLabel ?? 'Offline'] ?? CloudOff,
-    [activity?.statusLabel]
-  );
+  // Track scrolling to adjust dynamic top offset positioning
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Collapse when clicking outside the widget (especially useful on mobile)
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (widgetRef.current && !widgetRef.current.contains(event.target as Node)) {
+        setState('compact');
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const isOffline = !activity || activity.statusLabel === 'Offline';
+
+  // Retrieve proper icon depending on active status and platform
+  const StatusIcon = useMemo(() => {
+    if (isOffline) return CloudOff;
+    const label = activity?.statusLabel;
+    const app = activity?.appName?.toLowerCase() ?? '';
+    
+    if (label === 'Coding' || label === 'Debugging') {
+      return VscVscode;
+    }
+    if (label === 'Listening to Music') {
+      return SiSpotify;
+    }
+    if (label === 'Scrolling Reels' || label === 'Instagram') {
+      return SiInstagram;
+    }
+    if (label === 'Gaming') {
+      if (app.includes('steam')) return SiSteam;
+      if (app.includes('discord')) return SiDiscord;
+      return FaGamepad;
+    }
+    if (label === 'Browsing' || label === 'Researching') {
+      if (app.includes('chrome')) return SiGooglechrome;
+      return Search;
+    }
+    if (label === 'Watching Movies' || label === 'Streaming') {
+      if (app.includes('youtube')) return SiYoutube;
+      if (app.includes('netflix')) return SiNetflix;
+      return Film;
+    }
+    if (label === 'Reviewing Code') {
+      return SiGithub;
+    }
+    if (label === 'Designing') {
+      if (app.includes('figma')) return SiFigma;
+      return Palette;
+    }
+    return ICON_MAP[label ?? 'Offline'] ?? CloudOff;
+  }, [activity?.statusLabel, activity?.appName, isOffline]);
+
+  // Determine official brand colors dynamically
+  const IconColor = useMemo(() => {
+    if (isOffline) return 'currentColor';
+    const label = activity?.statusLabel;
+    const app = activity?.appName?.toLowerCase() ?? '';
+
+    if (label === 'Listening to Music') return '#1DB954'; // Spotify Brand Green
+    if (label === 'Coding' || label === 'Debugging') return '#007ACC'; // VS Code Brand Blue
+    if (label === 'Scrolling Reels' || label === 'Instagram') return '#E1306C'; // Instagram Pink
+    if (label === 'Gaming') {
+      if (app.includes('steam')) return '#66C0F4'; // Steam Blue
+      if (app.includes('discord')) return '#5865F2'; // Discord Purple
+      return '#A855F7'; // Gamepad Purple
+    }
+    if (label === 'Browsing' || label === 'Researching') return '#4285F4'; // Chrome Blue
+    if (label === 'Watching Movies' || label === 'Streaming') {
+      if (app.includes('youtube')) return '#FF0000'; // Youtube Red
+      return '#E50914'; // Netflix Red
+    }
+    if (label === 'Reviewing Code') return '#E2E8F0'; // GitHub Silver
+    if (label === 'Designing') return '#F24E1E'; // Figma Orange
+    return 'currentColor';
+  }, [activity?.statusLabel, activity?.appName, isOffline]);
+
+  // Determine ambient glow colors for the dark theme visibility
+  const boxStyle = useMemo(() => {
+    let ambientColor = 'rgba(255, 255, 255, 0.08)';
+    let borderOpacity = isHovered ? '0.35' : '0.24';
+    let glowIntensity = isHovered ? '25px' : '15px';
+
+    if (!isOffline) {
+      const label = activity?.statusLabel;
+      const app = activity?.appName?.toLowerCase() ?? '';
+      const multiplier = isHovered ? 1.4 : 1.0;
+      
+      if (label === 'Listening to Music') {
+        ambientColor = `rgba(29, 185, 84, ${0.28 * multiplier})`;
+      } else if (label === 'Coding' || label === 'Debugging') {
+        ambientColor = `rgba(0, 122, 204, ${0.28 * multiplier})`;
+      } else if (label === 'Scrolling Reels' || label === 'Instagram') {
+        ambientColor = `rgba(225, 48, 108, ${0.28 * multiplier})`;
+      } else if (label === 'Gaming') {
+        if (app.includes('steam')) ambientColor = `rgba(102, 192, 244, ${0.28 * multiplier})`;
+        else if (app.includes('discord')) ambientColor = `rgba(88, 101, 242, ${0.28 * multiplier})`;
+        else ambientColor = `rgba(168, 85, 247, ${0.28 * multiplier})`;
+      } else if (label === 'Browsing' || label === 'Researching') {
+        ambientColor = `rgba(66, 133, 244, ${0.28 * multiplier})`;
+      } else if (label === 'Watching Movies' || label === 'Streaming') {
+        ambientColor = `rgba(229, 9, 20, ${0.28 * multiplier})`;
+      } else if (label === 'Designing') {
+        ambientColor = `rgba(242, 78, 30, ${0.28 * multiplier})`;
+      } else {
+        ambientColor = `rgba(255, 255, 255, ${0.12 * multiplier})`;
+      }
+    } else {
+      const multiplier = isHovered ? 1.4 : 1.0;
+      // High contrast offline glow to ensure visibility on absolute dark backgrounds
+      ambientColor = `rgba(255, 255, 255, ${0.12 * multiplier})`;
+    }
+
+    return {
+      boxShadow: `0 12px 40px rgba(0, 0, 0, 0.85), 0 0 ${glowIntensity} ${ambientColor}`,
+      border: `1px solid rgba(255, 255, 255, ${borderOpacity})`,
+    };
+  }, [activity?.statusLabel, activity?.appName, isOffline, isHovered]);
+
   const statusParts = useMemo(
     () => formatStatusText(activity?.statusLabel ?? 'Offline', activity?.appName ?? null),
     [activity?.statusLabel, activity?.appName]
   );
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.2 }}
-      className="flex flex-col items-start gap-1.5"
-    >
-      {/* Small live badge row */}
-      <div className="flex items-center gap-2">
-        <PulseDot isOffline={isOffline} />
-        <span
-          className={`text-[9px] uppercase tracking-[0.25em] font-bold font-mono ${
-            isOffline ? 'text-foreground/30' : 'text-emerald-500/90'
-          }`}
-        >
-          {isOffline ? 'Offline Status' : 'Live Status'}
-        </span>
-        {/* Time Ago (Only when live) */}
-        {!loading && !isOffline && activity?.startedAt && (
-          <span className="text-[9px] text-foreground/30 font-mono tracking-normal lowercase">
-            ({timeAgo(activity.startedAt)})
-          </span>
-        )}
-      </div>
+  // iOS-style elastic springs
+  const springTransition = {
+    type: 'spring' as const,
+    stiffness: 350,
+    damping: 26,
+    mass: 0.8,
+  };
 
-      {/* Main statement with beautiful serif italic typography */}
-      <div className="flex items-baseline flex-wrap gap-x-2">
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+    if (state !== 'expanded') {
+      setState('medium');
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (state !== 'expanded') {
+      hoverTimeout.current = setTimeout(() => {
+        setState('compact');
+      }, 150); // 150ms timeout for instant response on leave
+    }
+  };
+
+  return (
+    <div
+      ref={widgetRef}
+      className={`fixed left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 ease-out pointer-events-auto
+        ${scrolled ? 'top-[80px]' : 'top-[112px]'}
+      `}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <motion.div
+        layout
+        transition={springTransition}
+        style={boxStyle}
+        onClick={() => {
+          if (state === 'expanded') {
+            setState('compact');
+          } else {
+            setState('expanded');
+          }
+        }}
+        className={`bg-zinc-950/98 text-white backdrop-blur-md cursor-pointer select-none overflow-hidden flex items-center justify-between
+          ${state === 'compact' ? 'w-[140px] h-[36px] rounded-full px-3.5' : ''}
+          ${state === 'medium' ? 'w-[220px] h-[36px] rounded-full px-4' : ''}
+          ${state === 'expanded' ? 'w-[calc(100vw-32px)] sm:w-[360px] h-auto rounded-[28px] p-5 flex-col gap-4' : ''}
+        `}
+      >
         <AnimatePresence mode="wait">
-          {loading ? (
-            <motion.span
-              key="loading"
+          {state === 'compact' && (
+            <motion.div
+              key="compact"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-base sm:text-lg font-mono text-foreground/30"
+              transition={{ duration: 0.15 }}
+              className="flex items-center justify-between w-full"
             >
-              checking activity...
-            </motion.span>
-          ) : (
-            <motion.div
-              key={activity?.statusLabel ?? 'offline'}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="flex items-center flex-wrap gap-x-2 text-foreground/70"
-            >
-              <StatusIcon size={14} strokeWidth={1.5} className="shrink-0 text-foreground/50 mr-0.5" />
-              <h3 className="text-lg sm:text-xl font-serif italic text-foreground leading-tight">
-                {statusParts.verb}
-              </h3>
-              {statusParts.noun && (
-                <span className="text-sm sm:text-base font-sans font-normal text-foreground/50 leading-tight">
-                  {statusParts.noun}
+              <div className="flex items-center gap-2">
+                <PulseDot isOffline={isOffline} />
+                <span className="text-[10px] tracking-[0.2em] font-mono text-white/95 font-bold uppercase select-none">
+                  {isOffline ? 'OFFLINE' : 'LIVE'}
                 </span>
-              )}
+              </div>
+              <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                <StatusIcon className="w-full h-full" style={{ color: IconColor }} />
+              </div>
+            </motion.div>
+          )}
+
+          {state === 'medium' && (
+            <motion.div
+              key="medium"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="flex items-center justify-between w-full"
+            >
+              <div className="flex items-center gap-2 overflow-hidden">
+                <PulseDot isOffline={isOffline} />
+                <span className="text-[10px] font-medium tracking-wider truncate text-white/90">
+                  {isOffline ? 'Currently Offline' : activity?.statusLabel}
+                </span>
+              </div>
+              <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                <StatusIcon className="w-full h-full" style={{ color: IconColor }} />
+              </div>
+            </motion.div>
+          )}
+
+          {state === 'expanded' && (
+            <motion.div
+              key="expanded"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col w-full text-left"
+              onClick={(e) => e.stopPropagation()} // Prevent clicking child items from closing the island
+            >
+              {/* Header row */}
+              <div className="flex items-center justify-between mb-3.5">
+                <div className="flex items-center gap-2">
+                  <PulseDot isOffline={isOffline} />
+                  <span className="text-[9px] font-mono tracking-[0.3em] text-white/40 uppercase">
+                    {isOffline ? 'OFFLINE' : 'LIVE ACTIVITY'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setState('compact')}
+                  className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 transition-colors"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+
+              {/* Status information with App-Icon styling */}
+              <div className="flex items-center gap-4 mt-1">
+                {/* Real iOS App Icon container */}
+                <div className="w-12 h-12 rounded-[10px] bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 flex items-center justify-center">
+                    <StatusIcon className="w-full h-full" style={{ color: IconColor }} />
+                  </div>
+                </div>
+
+                <div className="flex flex-col min-w-0">
+                  <div className="flex items-baseline flex-wrap gap-x-1.5">
+                    <h3 className="text-lg sm:text-xl font-serif italic text-white leading-tight">
+                      {statusParts.verb}
+                    </h3>
+                    {statusParts.noun && (
+                      <span className="text-sm sm:text-base font-sans font-normal text-white/50 leading-tight">
+                        {statusParts.noun}
+                      </span>
+                    )}
+                  </div>
+
+                  {!isOffline && activity?.startedAt && (
+                    <span className="text-[10px] text-white/40 font-mono tracking-wide lowercase mt-0.5">
+                      active since {timeAgo(activity.startedAt)}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Custom Micro-Visualizer / Graphic */}
+              <div className="mt-4 flex items-center justify-start min-h-[24px]">
+                {activity?.statusLabel === 'Listening to Music' && <MusicVisualizer />}
+                {(activity?.statusLabel === 'Coding' || activity?.statusLabel === 'Debugging') && <TerminalVisualizer />}
+                {activity?.statusLabel !== 'Listening to Music' &&
+                  activity?.statusLabel !== 'Coding' &&
+                  activity?.statusLabel !== 'Debugging' && (
+                    <div className="w-full h-[1px] bg-white/10" />
+                  )}
+              </div>
+
+              {/* Interactive bottom link */}
+              <div className="mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between">
+                <span className="text-[10px] text-white/30 font-mono">
+                  ag-island v1.0
+                </span>
+                <a
+                  href="#contact"
+                  onClick={() => setState('compact')}
+                  className="text-[10px] font-sans font-medium text-white/90 hover:text-white border-b border-white/20 hover:border-white/60 flex items-center gap-1 transition-colors"
+                >
+                  Get in touch
+                  <ExternalLink size={10} />
+                </a>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
