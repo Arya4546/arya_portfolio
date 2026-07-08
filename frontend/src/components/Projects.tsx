@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Github, ExternalLink, Zap, Shield, Code, Server, Layers, X, ArrowRight } from 'lucide-react';
+import { Github, ExternalLink, Zap, Shield, Code, Layers, X, ArrowRight } from 'lucide-react';
 
 const projectsData = [
     {
