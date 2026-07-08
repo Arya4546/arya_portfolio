@@ -28,8 +28,7 @@ const About = () => {
                         </h2>
                         <div className="space-y-6 md:space-y-8 text-base md:text-xl text-foreground/70 leading-relaxed">
                             <p>
-                                Driven by the intersection of design and data, I craft technical excellence through
-                                cinematic digital experiences and robust engineering.
+                                I am a Backend Software Developer based in Noida/Delhi NCR. Driven by the intersection of data and scalable architecture, I specialize in Node.js, PostgreSQL, and DPDPA/GDPR privacy engineering to build secure, robust systems.
                             </p>
                             <div className="pt-8 md:pt-12 grid grid-cols-2 gap-8 md:gap-12 border-t border-foreground/10">
                                 <div>
@@ -54,7 +53,8 @@ const About = () => {
                         <div className="absolute inset-0 bg-black overflow-hidden">
                             <img
                                 src={aryaImg}
-                                alt="Arya Deep Singh"
+                                alt="Arya Deep Singh - Backend Developer from Noida, India"
+                                loading="lazy"
                                 className="w-full h-full object-cover object-top opacity-90 transition-opacity duration-700 ease-in-out group-hover:opacity-100"
                             />
                         </div>

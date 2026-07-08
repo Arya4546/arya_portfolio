@@ -31,6 +31,7 @@ const Hero = () => {
                         </span>
                         <h1 className="text-[14vw] md:text-[8vw] lg:text-[7rem] leading-[1] md:leading-[0.9] font-serif mb-4 lg:mb-8 italic whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/50 pb-2 lg:pb-4">
                             Arya <br /> Deep Singh
+                            <span className="sr-only"> — Backend Developer</span>
                         </h1>
                         <div className="flex flex-col w-full gap-6 lg:gap-8">
                             <p className="text-base md:text-xl lg:text-2xl text-foreground/60 font-sans leading-relaxed max-w-xl">
@@ -69,7 +70,7 @@ const Hero = () => {
                         >
                             <img
                                 src={aryaImg}
-                                alt="Arya Deep Singh"
+                                alt="Arya Deep Singh - Backend Developer from Noida, India"
                                 className="w-full h-full object-cover object-center"
                             />
                             {/* Decorative Subtle Glow */}
