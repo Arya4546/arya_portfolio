@@ -22,6 +22,7 @@ const ALLOWED_STATUSES = new Set([
     // Learning
     'Studying',
     'Reading',
+    'Researching',
     // Entertainment
     'Listening to Music',
     'Watching Movies',
@@ -57,7 +58,9 @@ const setActivity = async (req, res) => {
             res.status(400).json({ error: 'statusLabel is required and must be a string' });
             return;
         }
-        if (!ALLOWED_STATUSES.has(statusLabel)) {
+        // Case-insensitive match and normalization
+        const normalizedStatus = Array.from(ALLOWED_STATUSES).find((status) => status.toLowerCase() === statusLabel.toLowerCase());
+        if (!normalizedStatus) {
             res.status(400).json({
                 error: `Unknown statusLabel: "${statusLabel}"`,
                 allowed: Array.from(ALLOWED_STATUSES).sort(),
@@ -67,7 +70,7 @@ const setActivity = async (req, res) => {
         // Deactivate any currently active status
         await activityStatus_model_1.default.update({ isActive: false }, { where: { isActive: true } });
         const created = await activityStatus_model_1.default.create({
-            statusLabel,
+            statusLabel: normalizedStatus,
             appName: appName ?? null,
             icon: icon ?? null,
             startedAt: new Date(),
