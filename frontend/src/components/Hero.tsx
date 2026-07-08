@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
-import HeroVisuals from './HeroVisuals';
 import Magnetic from './Magnetic';
+import aryaImg from '../assets/arya.png';
 
 const Hero = () => {
     return (
-        <section className="relative min-h-screen lg:fixed lg:inset-0 lg:h-[100dvh] flex items-center justify-center overflow-y-auto lg:overflow-hidden bg-background pt-32 lg:pt-0 pb-24 lg:pb-0">
+        <section id="hero" className="relative min-h-screen lg:fixed lg:inset-0 lg:h-[100dvh] flex items-center justify-center overflow-y-auto lg:overflow-hidden bg-background pt-32 lg:pt-0 pb-24 lg:pb-0">
             {/* Subtle background glow */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse" />
@@ -40,7 +40,8 @@ const Hero = () => {
                             </p>
                             <div>
                                 <Magnetic intensity={0.2}>
-                                    <motion.button
+                                    <motion.a
+                                        href="#projects"
                                         whileHover={{
                                             scale: 1.02,
                                             boxShadow: "0 0 40px rgba(53, 102, 60, 0.2)"
@@ -52,15 +53,29 @@ const Hero = () => {
                                         <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-background flex items-center justify-center group-hover:rotate-[135deg] transition-transform duration-500">
                                             <ArrowDown size={18} className="text-foreground" />
                                         </div>
-                                    </motion.button>
+                                    </motion.a>
                                 </Magnetic>
                             </div>
                         </div>
                     </motion.div>
 
                     {/* Right side Visual */}
-                    <div className="flex lg:col-span-5 justify-center lg:justify-end items-center w-full mt-4 lg:mt-0">
-                        <HeroVisuals />
+                    <div className="flex lg:col-span-5 justify-center lg:justify-end items-center w-full mt-4 lg:mt-0 relative">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                            className="relative w-64 h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px] rounded-full overflow-hidden border-4 border-foreground/10 shadow-2xl"
+                        >
+                            <img
+                                src={aryaImg}
+                                alt="Arya Deep Singh"
+                                className="w-full h-full object-cover object-center"
+                            />
+                            {/* Decorative Subtle Glow */}
+                            <div className="absolute inset-0 ring-1 ring-inset ring-foreground/20 rounded-full pointer-events-none" />
+                        </motion.div>
+                        <div className="absolute -z-10 w-96 h-96 bg-foreground/5 rounded-full blur-[80px] pointer-events-none" />
                     </div>
 
                 </div>

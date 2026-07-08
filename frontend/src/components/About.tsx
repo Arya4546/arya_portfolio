@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import portfolioImg from '../assets/portfolio.jpeg';
+import aryaImg from '../assets/arya.png';
 
 const About = () => {
     const container = useRef<HTMLElement>(null);
@@ -53,9 +53,9 @@ const About = () => {
                     >
                         <div className="absolute inset-0 bg-black overflow-hidden">
                             <img
-                                src={portfolioImg}
+                                src={aryaImg}
                                 alt="Arya Deep Singh"
-                                className="w-full h-full object-cover object-top opacity-70 grayscale-[0.8] group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-in-out"
+                                className="w-full h-full object-cover object-top opacity-90 transition-opacity duration-700 ease-in-out group-hover:opacity-100"
                             />
                         </div>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />

@@ -161,9 +161,9 @@ const Navbar = () => {
                             variants={linkVariants}
                             className="mt-20 flex gap-8 opacity-40"
                         >
-                            <a href="#" className="uppercase tracking-[0.3em] text-xs">LinkedIn</a>
-                            <a href="#" className="uppercase tracking-[0.3em] text-xs">Github</a>
-                            <a href="#" className="uppercase tracking-[0.3em] text-xs">Email</a>
+                            <a href="https://www.linkedin.com/in/arya-deep-singh-8b1a84230" target="_blank" rel="noopener noreferrer" className="uppercase tracking-[0.3em] text-xs">LinkedIn</a>
+                            <a href="https://github.com/Arya4546" target="_blank" rel="noopener noreferrer" className="uppercase tracking-[0.3em] text-xs">Github</a>
+                            <a href="mailto:singharya9693@gmail.com" className="uppercase tracking-[0.3em] text-xs">Email</a>
                         </motion.div>
                     </motion.div>
                 )}

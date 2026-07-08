@@ -27,7 +27,7 @@ const services: Service[] = [
 
 const Services = () => {
     return (
-        <section className="bg-background px-6 md:px-20 py-32">
+        <section id="services" className="bg-background px-6 md:px-20 pt-32 pb-16">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-20 md:mb-32">
                     <span className="text-xs uppercase tracking-[0.4em] text-foreground/40 mb-4 md:mb-6 block">Areas of Mastery</span>
@@ -59,7 +59,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
     const scale = useTransform(scrollYProgress, [0, 1], [0.8 + (index * 0.05), 1]);
 
     return (
-        <div ref={container} className="h-screen flex items-center justify-center sticky top-0 px-4 md:px-0">
+        <div ref={container} className="min-h-[60vh] flex items-center justify-center sticky top-[10vh] md:top-[20vh] px-4 md:px-0">
             <motion.div
                 style={{ scale, top: `calc(-10% + ${index * 25}px)` }}
                 className="w-full bg-accent/5 backdrop-blur-2xl border border-foreground/5 rounded-[2rem] md:rounded-[3rem] p-8 md:p-24 relative overflow-hidden group hover:border-primary/20 transition-colors duration-700"
