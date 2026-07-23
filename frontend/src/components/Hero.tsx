@@ -1,7 +1,43 @@
 import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import Magnetic from './Magnetic';
+import NameParticles from './NameParticles';
 import aryaImg from '../assets/arya.png';
+
+// Paragraph reveal is a plain typographic cascade (not particle-based) so it
+// stays real, readable, selectable text — it just plays right after the name
+// finishes assembling, using the same easing curve as the rest of the site.
+const paragraphSegments = [
+    { text: 'Software Developer crafting technical excellence through', emphasis: false },
+    { text: 'cinematic digital experiences', emphasis: true },
+    { text: 'and robust engineering.', emphasis: false },
+];
+
+const paragraphWords = paragraphSegments.flatMap(({ text, emphasis }) =>
+    text.split(' ').map((word) => ({ word, emphasis }))
+);
+
+const prefersReducedMotion =
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const paragraphContainerVariants: Variants = {
+    hidden: {},
+    visible: {
+        transition: prefersReducedMotion ? {} : { delayChildren: 1.5, staggerChildren: 0.035 },
+    },
+};
+
+const paragraphWordVariants: Variants = {
+    hidden: prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: '0.4em' },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: prefersReducedMotion ? { duration: 0 } : { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+    },
+};
 
 const Hero = () => {
     return (
@@ -29,16 +65,24 @@ const Hero = () => {
                         <span className="text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-foreground/40 mb-4 lg:mb-6 leading-relaxed">
                             Available for Freelance & Internships • 1+ Year Exp.
                         </span>
-                        <h1 className="text-[14vw] md:text-[8vw] lg:text-[7rem] leading-[1] md:leading-[0.9] font-serif mb-4 lg:mb-8 italic whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/50 pb-2 lg:pb-4">
-                            Arya <br /> Deep Singh
-                            <span className="sr-only"> — Backend Developer</span>
-                        </h1>
+                        <NameParticles />
                         <div className="flex flex-col w-full gap-6 lg:gap-8">
-                            <p className="text-base md:text-xl lg:text-2xl text-foreground/60 font-sans leading-relaxed max-w-xl">
-                                Software Developer crafting technical excellence through
-                                <span className="text-foreground"> cinematic digital experiences </span>
-                                and robust engineering.
-                            </p>
+                            <motion.p
+                                variants={paragraphContainerVariants}
+                                initial="hidden"
+                                animate="visible"
+                                className="text-base md:text-xl lg:text-2xl text-foreground/60 font-sans leading-relaxed max-w-xl"
+                            >
+                                {paragraphWords.map(({ word, emphasis }, index) => (
+                                    <motion.span
+                                        key={`${word}-${index}`}
+                                        variants={paragraphWordVariants}
+                                        className={`inline-block mr-[0.28em] ${emphasis ? 'text-foreground' : ''}`}
+                                    >
+                                        {word}
+                                    </motion.span>
+                                ))}
+                            </motion.p>
                             <div>
                                 <Magnetic intensity={0.2}>
                                     <motion.a
