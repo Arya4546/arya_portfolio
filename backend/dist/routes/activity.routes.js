@@ -7,6 +7,7 @@ const router = (0, express_1.Router)();
 // Public endpoints
 router.get('/activity', activity_controller_1.getActivity);
 router.get('/activity/statuses', activity_controller_1.getAllowedStatuses);
+router.get('/activity/stream', activity_controller_1.streamActivity);
 // Protected endpoint
 router.post('/activity', auth_middleware_1.requireSecret, activity_controller_1.setActivity);
 exports.default = router;

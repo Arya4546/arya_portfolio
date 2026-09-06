@@ -54,6 +54,20 @@ const ALLOWED_STATUSES = new Set([
 /** 30-minute staleness threshold (ms) */
 const STALE_THRESHOLD_MS = 30 * 60 * 1000;
 
+// SSE Client management
+const clients = new Set<Response>();
+
+const broadcast = (data: any) => {
+  const payload = `data: ${JSON.stringify(data)}\n\n`;
+  for (const client of clients) {
+    try {
+      client.write(payload);
+    } catch (err) {
+      clients.delete(client);
+    }
+  }
+};
+
 export const setActivity = async (req: Request, res: Response): Promise<void> => {
   try {
     const { statusLabel, appName, icon } = req.body;
@@ -98,6 +112,14 @@ export const setActivity = async (req: Request, res: Response): Promise<void> =>
       startedAt: created.startedAt,
       isActive: created.isActive,
     });
+
+    // Broadcast update to all connected SSE clients
+    broadcast({
+      statusLabel: created.statusLabel,
+      icon: created.icon,
+      appName: created.appName,
+      startedAt: created.startedAt,
+    });
   } catch (err) {
     console.error('setActivity error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -141,4 +163,45 @@ export const getActivity = async (_req: Request, res: Response): Promise<void> =
 
 export const getAllowedStatuses = (_req: Request, res: Response): void => {
   res.json({ statuses: Array.from(ALLOWED_STATUSES).sort() });
+};
+
+export const streamActivity = async (req: Request, res: Response): Promise<void> => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  // Send current state immediately on connection
+  try {
+    const current = await ActivityStatus.findOne({
+      where: { isActive: true },
+      order: [['startedAt', 'DESC']],
+      attributes: ['statusLabel', 'appName', 'icon', 'startedAt'],
+    });
+
+    const isStale =
+      !current ||
+      Date.now() - new Date(current.startedAt).getTime() > STALE_THRESHOLD_MS;
+
+    const data = isStale ? {
+      statusLabel: 'Offline',
+      icon: 'cloud-off',
+      appName: null,
+      startedAt: null,
+    } : {
+      statusLabel: current.statusLabel,
+      icon: current.icon,
+      appName: current.appName,
+      startedAt: current.startedAt,
+    };
+
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+  } catch (err) {
+    console.error('Initial stream fetch error:', err);
+  }
+
+  clients.add(res);
+
+  req.on('close', () => {
+    clients.delete(res);
+  });
 };

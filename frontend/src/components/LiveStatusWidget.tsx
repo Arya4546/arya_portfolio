@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Terminal, Bug, Palette, PenTool, GraduationCap, BookOpen,
@@ -30,7 +30,6 @@ interface StatusTextStructure {
 /* ─── Config ───────────────────────────────────────────────── */
 
 const API_URL = import.meta.env.VITE_ACTIVITY_API_URL || 'http://localhost:4000/api/activity';
-const POLL_INTERVAL_MS = 20_000;
 const TIME_UPDATE_MS = 30_000;
 
 /* ─── Icon Registry ────────────────────────────────────────── */
@@ -223,25 +222,30 @@ export default function LiveStatusWidget() {
   const hasReceivedData = useRef(false);
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchActivity = useCallback(async () => {
-    try {
-      const res = await fetch(API_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: ActivityData = await res.json();
-      setActivity(data);
-      hasReceivedData.current = true;
-    } catch {
+  useEffect(() => {
+    const streamUrl = `${API_URL}/stream`;
+    const eventSource = new EventSource(streamUrl);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data: ActivityData = JSON.parse(event.data);
+        setActivity(data);
+        hasReceivedData.current = true;
+      } catch (err) {
+        console.error('Error parsing SSE data', err);
+      }
+    };
+
+    eventSource.onerror = () => {
       if (!hasReceivedData.current) {
         setActivity({ statusLabel: 'Offline', icon: null, appName: null, startedAt: null });
       }
-    }
-  }, []);
+    };
 
-  useEffect(() => {
-    fetchActivity();
-    const interval = setInterval(fetchActivity, POLL_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [fetchActivity]);
+    return () => {
+      eventSource.close();
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => setTick((t) => t + 1), TIME_UPDATE_MS);
@@ -409,7 +413,7 @@ export default function LiveStatusWidget() {
     <div
       ref={widgetRef}
       className={`fixed left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 ease-out pointer-events-auto
-        ${scrolled ? 'top-[80px]' : 'top-[112px]'}
+        ${scrolled ? 'bottom-8 md:top-[80px] md:bottom-auto' : 'bottom-8 md:top-[112px] md:bottom-auto'}
       `}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

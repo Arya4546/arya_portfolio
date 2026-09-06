@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllowedStatuses = exports.getActivity = exports.setActivity = void 0;
+exports.streamActivity = exports.getAllowedStatuses = exports.getActivity = exports.setActivity = void 0;
 const activityStatus_model_1 = __importDefault(require("../models/activityStatus.model"));
 /**
  * Expanded whitelist of allowed statuses.
@@ -51,6 +51,19 @@ const ALLOWED_STATUSES = new Set([
 ]);
 /** 30-minute staleness threshold (ms) */
 const STALE_THRESHOLD_MS = 30 * 60 * 1000;
+// SSE Client management
+const clients = new Set();
+const broadcast = (data) => {
+    const payload = `data: ${JSON.stringify(data)}\n\n`;
+    for (const client of clients) {
+        try {
+            client.write(payload);
+        }
+        catch (err) {
+            clients.delete(client);
+        }
+    }
+};
 const setActivity = async (req, res) => {
     try {
         const { statusLabel, appName, icon } = req.body;
@@ -83,6 +96,13 @@ const setActivity = async (req, res) => {
             icon: created.icon,
             startedAt: created.startedAt,
             isActive: created.isActive,
+        });
+        // Broadcast update to all connected SSE clients
+        broadcast({
+            statusLabel: created.statusLabel,
+            icon: created.icon,
+            appName: created.appName,
+            startedAt: created.startedAt,
         });
     }
     catch (err) {
@@ -127,4 +147,39 @@ const getAllowedStatuses = (_req, res) => {
     res.json({ statuses: Array.from(ALLOWED_STATUSES).sort() });
 };
 exports.getAllowedStatuses = getAllowedStatuses;
+const streamActivity = async (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    // Send current state immediately on connection
+    try {
+        const current = await activityStatus_model_1.default.findOne({
+            where: { isActive: true },
+            order: [['startedAt', 'DESC']],
+            attributes: ['statusLabel', 'appName', 'icon', 'startedAt'],
+        });
+        const isStale = !current ||
+            Date.now() - new Date(current.startedAt).getTime() > STALE_THRESHOLD_MS;
+        const data = isStale ? {
+            statusLabel: 'Offline',
+            icon: 'cloud-off',
+            appName: null,
+            startedAt: null,
+        } : {
+            statusLabel: current.statusLabel,
+            icon: current.icon,
+            appName: current.appName,
+            startedAt: current.startedAt,
+        };
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+    }
+    catch (err) {
+        console.error('Initial stream fetch error:', err);
+    }
+    clients.add(res);
+    req.on('close', () => {
+        clients.delete(res);
+    });
+};
+exports.streamActivity = streamActivity;
 //# sourceMappingURL=activity.controller.js.map

@@ -85,15 +85,15 @@ const Contact = () => {
                     <form className="flex flex-col gap-10" onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-4">
                             <label htmlFor="name" className="text-xs uppercase tracking-widest text-foreground/50 font-bold">Your Identity</label>
-                            <input id="name" name="name" type="text" required placeholder="Name" className="bg-transparent border-b border-foreground/20 py-4 focus:outline-none focus:border-foreground transition-colors text-xl font-serif text-foreground placeholder:text-foreground/30" />
+                            <input id="name" name="name" type="text" required placeholder="Name" className="bg-transparent border-b border-foreground/20 py-4 focus:outline-none focus:border-foreground transition-colors text-base md:text-xl font-serif text-foreground placeholder:text-foreground/30" />
                         </div>
                         <div className="flex flex-col gap-4">
                             <label htmlFor="email" className="text-xs uppercase tracking-widest text-foreground/50 font-bold">Electronic Mail</label>
-                            <input id="email" name="email" type="email" required placeholder="Email" className="bg-transparent border-b border-foreground/20 py-4 focus:outline-none focus:border-foreground transition-colors text-xl font-serif text-foreground placeholder:text-foreground/30" />
+                            <input id="email" name="email" type="email" required placeholder="Email" className="bg-transparent border-b border-foreground/20 py-4 focus:outline-none focus:border-foreground transition-colors text-base md:text-xl font-serif text-foreground placeholder:text-foreground/30" />
                         </div>
                         <div className="flex flex-col gap-4">
                             <label htmlFor="message" className="text-xs uppercase tracking-widest text-foreground/50 font-bold">The Message</label>
-                            <textarea id="message" name="message" required placeholder="Tell me about your project..." rows={4} className="bg-transparent border-b border-foreground/20 py-4 focus:outline-none focus:border-foreground transition-colors text-xl font-serif resize-none text-foreground placeholder:text-foreground/30" />
+                            <textarea id="message" name="message" required placeholder="Tell me about your project..." rows={4} className="bg-transparent border-b border-foreground/20 py-4 focus:outline-none focus:border-foreground transition-colors text-base md:text-xl font-serif resize-none text-foreground placeholder:text-foreground/30" />
                         </div>
                         <Magnetic intensity={0.1}>
                         <motion.button

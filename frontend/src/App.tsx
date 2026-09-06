@@ -22,6 +22,8 @@ function App() {
       touchMultiplier: 1,
     });
 
+    (window as any).__lenis = lenis;
+
     function raf(time: number) {
       lenis.raf(time);
       requestAnimationFrame(raf);
@@ -30,6 +32,7 @@ function App() {
     requestAnimationFrame(raf);
 
     return () => {
+      delete (window as any).__lenis;
       lenis.destroy();
     };
   }, []);

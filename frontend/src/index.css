@@ -55,6 +55,7 @@
 
   html,
   body {
+    font-family: var(--font-sans);
     scrollbar-width: none;
     -ms-overflow-style: none;
     scroll-behavior: smooth;
@@ -72,6 +73,28 @@
   h3 {
     @apply tracking-tight font-serif;
   }
+}
+
+.modal-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 120, 120, 0.25) transparent;
+}
+
+.modal-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(120, 120, 120, 0.25);
+  border-radius: 9999px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(120, 120, 120, 0.5);
 }
 
 .custom-cursor-active {
