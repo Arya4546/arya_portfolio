@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Github, ExternalLink, Zap, Shield, Code, Layers, X, ArrowRight, CheckCircle2, Cpu, Database, Globe } from 'lucide-react';
 
@@ -352,229 +353,218 @@ const Projects = () => {
             </div>
 
             {/* Bespoke Architectural Case Study Modal */}
-            <AnimatePresence>
-                {selectedProject && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        data-lenis-prevent="true"
-                        onWheel={(e) => e.stopPropagation()}
-                        onTouchMove={(e) => e.stopPropagation()}
-                        className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6 md:p-10 bg-black/85 backdrop-blur-2xl overscroll-contain"
-                        onClick={() => setSelectedProject(null)}
-                    >
+            {createPortal(
+                <AnimatePresence>
+                    {selectedProject && (
                         <motion.div
-                            role="dialog"
-                            aria-modal="true"
-                            aria-label={`Case study for ${selectedProject.title}`}
-                            initial={{ opacity: 0, scale: 0.96, y: 25 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.96, y: 15 }}
-                            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.25 }}
                             data-lenis-prevent="true"
-                            className="relative w-full max-w-4xl max-h-[90vh] md:max-h-[86vh] flex flex-col rounded-[2rem] md:rounded-[2.5rem] bg-background/95 border border-foreground/15 shadow-[0_30px_90px_rgba(0,0,0,0.8)] overflow-hidden overscroll-contain"
+                            onWheel={(e) => e.stopPropagation()}
+                            onTouchMove={(e) => e.stopPropagation()}
+                            className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6 md:p-10 bg-black/85 backdrop-blur-2xl overscroll-contain"
+                            onClick={() => setSelectedProject(null)}
                         >
-                            {/* Modal Sticky Header Bar */}
-                            <div className="flex items-center justify-between px-6 sm:px-8 py-4 bg-background/90 backdrop-blur-md border-b border-foreground/10 shrink-0 z-20">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-                                        <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                                        <span className="text-[10px] font-mono font-medium tracking-widest text-primary uppercase">
-                                            Case Study • {selectedProject.year}
-                                        </span>
-                                    </div>
-                                    <span className="text-xs font-mono text-foreground/40 uppercase hidden sm:inline-block">
-                                        {selectedProject.category}
-                                    </span>
+                            <motion.div
+                                role="dialog"
+                                aria-modal="true"
+                                aria-label={`Case study for ${selectedProject.title}`}
+                                initial={{ opacity: 0, scale: 0.96, y: 25 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.96, y: 15 }}
+                                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                                onClick={(e) => e.stopPropagation()}
+                                data-lenis-prevent="true"
+                                className="relative w-full h-[95vh] md:h-auto md:max-h-[85vh] max-w-5xl flex flex-col bg-background/95 backdrop-blur-3xl border-t md:border border-foreground/10 md:rounded-[2rem] rounded-t-[2rem] rounded-b-none mt-auto md:mt-0 shadow-[0_-20px_80px_rgba(0,0,0,0.2)] md:shadow-[0_30px_100px_rgba(0,0,0,0.5)] overflow-hidden overscroll-contain origin-bottom md:origin-center"
+                            >
+                                {/* Mobile Drag Handle Indicator */}
+                                <div className="w-full flex justify-center pt-3 pb-1 md:hidden bg-background/50 absolute top-0 z-30">
+                                    <div className="w-12 h-1.5 bg-foreground/20 rounded-full" />
                                 </div>
 
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-mono text-foreground/40 hidden sm:inline-block px-2 py-0.5 rounded border border-foreground/10">
-                                        ESC
-                                    </span>
-                                    <button 
-                                        onClick={() => setSelectedProject(null)}
-                                        className="w-9 h-9 rounded-full bg-foreground/5 hover:bg-foreground/15 border border-foreground/10 flex items-center justify-center transition-all duration-300 text-foreground/70 hover:text-foreground hover:rotate-90"
-                                        aria-label="Close Case Study"
-                                    >
-                                        <X size={18} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Modal Scrollable Content Area with Custom Scrollbar */}
-                            <div className="flex-1 overflow-y-auto modal-scrollbar p-6 sm:p-10 md:p-12 space-y-8 sm:space-y-10 overscroll-contain">
-                                
-                                {/* Project Hero Emblem & Title */}
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
-                                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-foreground/[0.04] border border-foreground/10 flex items-center justify-center shrink-0 shadow-inner">
-                                        <div className="scale-125">
-                                            {selectedProject.icon}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <span className="text-xs font-mono uppercase tracking-[0.25em] text-primary block mb-1.5">
-                                            {selectedProject.tagline}
-                                        </span>
-                                        <h3 className="text-3xl sm:text-5xl md:text-6xl font-serif tracking-tight text-foreground">
-                                            {selectedProject.title}
-                                        </h3>
-                                    </div>
-                                </div>
-
-                                {/* Architecture & Spec Grid */}
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                                    <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/8">
-                                        <div className="flex items-center gap-2 text-foreground/40 mb-1 font-mono text-[10px] uppercase tracking-wider">
-                                            <Cpu size={13} />
-                                            <span>Timeline</span>
-                                        </div>
-                                        <p className="font-serif italic text-lg sm:text-xl text-foreground">
-                                            {selectedProject.year}
-                                        </p>
-                                    </div>
-
-                                    <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/8">
-                                        <div className="flex items-center gap-2 text-foreground/40 mb-1 font-mono text-[10px] uppercase tracking-wider">
-                                            <Layers size={13} />
-                                            <span>Role</span>
-                                        </div>
-                                        <p className="font-serif italic text-base sm:text-lg text-foreground truncate" title={selectedProject.role}>
-                                            {selectedProject.role.split('&')[0]}
-                                        </p>
-                                    </div>
-
-                                    <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/8">
-                                        <div className="flex items-center gap-2 text-foreground/40 mb-1 font-mono text-[10px] uppercase tracking-wider">
-                                            <Database size={13} />
-                                            <span>Primary DB</span>
-                                        </div>
-                                        <p className="font-serif italic text-lg sm:text-xl text-foreground">
-                                            {selectedProject.stack.find(s => s.includes('Postgre') || s.includes('Prisma') || s.includes('Redis')) || 'PostgreSQL'}
-                                        </p>
-                                    </div>
-
-                                    <div className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/8">
-                                        <div className="flex items-center gap-2 text-foreground/40 mb-1 font-mono text-[10px] uppercase tracking-wider">
-                                            <Globe size={13} />
-                                            <span>Deployment</span>
-                                        </div>
-                                        <p className="font-serif italic text-lg sm:text-xl text-foreground">
-                                            {selectedProject.liveLink ? 'Live Active' : 'Open Source'}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Deep-Dive Architecture Narrative */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <span className="w-6 h-[1px] bg-primary/70" />
-                                        <h4 className="text-xs font-mono uppercase tracking-widest text-foreground/60 font-semibold">
-                                            System Architecture & Engineering
-                                        </h4>
-                                    </div>
-
-                                    <div className="pl-4 sm:pl-5 border-l-2 border-primary/40 py-1 mb-4">
-                                        <p className="text-base sm:text-lg md:text-xl font-serif italic text-foreground/90 leading-relaxed">
-                                            "{selectedProject.description}"
-                                        </p>
-                                    </div>
-
-                                    <p className="font-sans text-sm sm:text-base md:text-lg text-foreground/80 leading-relaxed font-light">
-                                        {selectedProject.detailedDescription}
-                                    </p>
-                                </div>
-
-                                {/* Key Capabilities Cards Grid */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <span className="w-6 h-[1px] bg-primary/70" />
-                                        <h4 className="text-xs font-mono uppercase tracking-widest text-foreground/60 font-semibold">
-                                            Core Technical Feats
-                                        </h4>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                        {selectedProject.features.map((feature, i) => (
-                                            <div 
-                                                key={i} 
-                                                className="p-4 sm:p-5 rounded-2xl bg-foreground/[0.025] border border-foreground/8 hover:border-primary/30 transition-colors flex items-start gap-3"
-                                            >
-                                                <div className="mt-0.5 p-1 rounded-full bg-primary/10 text-primary shrink-0">
-                                                    <CheckCircle2 size={16} />
-                                                </div>
-                                                <span className="text-xs sm:text-sm text-foreground/85 font-light leading-relaxed">
-                                                    {feature}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Technology Stack */}
-                                <div className="space-y-4 border-t border-foreground/10 pt-6">
-                                    <div className="flex items-center gap-3">
-                                        <span className="w-6 h-[1px] bg-primary/70" />
-                                        <h4 className="text-xs font-mono uppercase tracking-widest text-foreground/60 font-semibold">
-                                            Technology Stack & Tooling
-                                        </h4>
-                                    </div>
-
-                                    <div className="flex flex-wrap gap-2">
-                                        {selectedProject.stack.map((tech, i) => (
-                                            <span 
-                                                key={i} 
-                                                className="text-xs sm:text-sm font-mono font-medium px-4 py-2 rounded-full bg-foreground/[0.04] border border-foreground/10 text-foreground/85 hover:border-primary/40 hover:bg-foreground/[0.07] transition-all"
-                                            >
-                                                {tech}
+                                {/* Modal Sticky Header Bar */}
+                                <div className="flex items-center justify-between px-5 sm:px-10 py-5 md:py-6 bg-background/80 backdrop-blur-xl border-b border-foreground/5 shrink-0 z-20 pt-10 md:pt-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 shadow-inner">
+                                            <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
+                                            <span className="text-[10px] md:text-xs font-mono font-bold tracking-widest text-primary uppercase mt-0.5">
+                                                Case Study
                                             </span>
-                                        ))}
+                                        </div>
+                                        <span className="text-[10px] md:text-xs font-mono text-foreground/40 uppercase hidden sm:inline-block tracking-widest border-l border-foreground/10 pl-4">
+                                            {selectedProject.category}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-[10px] font-mono text-foreground/40 hidden sm:inline-block px-2 py-1 rounded border border-foreground/10 uppercase tracking-widest">
+                                            ESC
+                                        </span>
+                                        <button 
+                                            onClick={() => setSelectedProject(null)}
+                                            className="w-10 h-10 rounded-full bg-foreground/[0.03] hover:bg-foreground/10 border border-foreground/10 flex items-center justify-center transition-all duration-300 text-foreground/60 hover:text-foreground hover:rotate-90 hover:scale-105"
+                                            aria-label="Close Case Study"
+                                        >
+                                            <X size={20} strokeWidth={1.5} />
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Modal Sticky Bottom Action Bar */}
-                            <div className="flex flex-wrap items-center justify-between gap-4 px-6 sm:px-8 py-4 bg-background/90 backdrop-blur-md border-t border-foreground/10 shrink-0 z-20">
-                                <span className="text-xs font-mono text-foreground/40 hidden sm:inline-block">
-                                    Authored by Arya Deep Singh • Noida, India
-                                </span>
+                                {/* Modal Scrollable Content Area */}
+                                <div className="flex-1 overflow-y-auto modal-scrollbar relative bg-gradient-to-b from-background via-background to-foreground/[0.02]">
+                                    {/* Subtle Background Pattern/Gradient */}
+                                    <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+                                    
+                                    <div className="p-6 sm:p-10 md:p-14 space-y-12 sm:space-y-16 max-w-4xl mx-auto relative z-10">
+                                        {/* Project Hero Emblem & Title */}
+                                        <div className="flex flex-col gap-6 md:gap-8">
+                                            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[2rem] bg-gradient-to-br from-foreground/[0.08] to-foreground/[0.02] border border-foreground/10 flex items-center justify-center shrink-0 shadow-lg shadow-black/5">
+                                                <div className="scale-[1.5] sm:scale-[1.8] text-foreground/80">
+                                                    {selectedProject.icon}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span className="text-xs md:text-sm font-mono uppercase tracking-[0.3em] text-primary block mb-4 font-semibold">
+                                                    {selectedProject.tagline}
+                                                </span>
+                                                <h3 className="text-4xl sm:text-5xl md:text-7xl font-serif tracking-tight text-foreground leading-[1.1]">
+                                                    {selectedProject.title}
+                                                </h3>
+                                            </div>
+                                        </div>
 
-                                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                                    {selectedProject.githubLink && (
-                                        <a
-                                            href={selectedProject.githubLink}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-full border border-foreground/20 hover:border-foreground/50 text-foreground font-mono text-xs uppercase tracking-wider hover:scale-105 transition-all flex items-center gap-2"
-                                        >
-                                            <Github size={16} />
-                                            <span>Repository</span>
-                                        </a>
-                                    )}
-                                    {selectedProject.liveLink ? (
-                                        <a
-                                            href={selectedProject.liveLink}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="px-6 py-2.5 sm:px-8 sm:py-3 rounded-full bg-foreground text-background font-mono text-xs uppercase tracking-wider hover:scale-105 transition-transform flex items-center gap-2 shadow-lg shadow-black/10"
-                                        >
-                                            <span>Launch Platform</span>
-                                            <ExternalLink size={14} />
-                                        </a>
-                                    ) : (
-                                        <span className="px-4 py-2 text-xs font-mono text-foreground/40 italic">
-                                            Internal / Research Project
-                                        </span>
-                                    )}
+                                        {/* Architecture & Spec Grid (Premium Cards) */}
+                                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                                            {[
+                                                { label: 'Timeline', icon: <Cpu size={14} />, value: selectedProject.year },
+                                                { label: 'Role', icon: <Layers size={14} />, value: selectedProject.role.split('&')[0] },
+                                                { label: 'Primary DB', icon: <Database size={14} />, value: selectedProject.stack.find(s => s.includes('Postgre') || s.includes('Prisma') || s.includes('Redis')) || 'PostgreSQL' },
+                                                { label: 'Deployment', icon: <Globe size={14} />, value: selectedProject.liveLink ? 'Live Active' : 'Open Source' }
+                                            ].map((stat, idx) => (
+                                                <div key={idx} className="p-5 sm:p-6 rounded-[1.5rem] bg-foreground/[0.02] border border-foreground/5 hover:bg-foreground/[0.04] transition-colors group">
+                                                    <div className="flex items-center gap-2.5 text-foreground/40 mb-3 font-mono text-[10px] md:text-xs uppercase tracking-widest group-hover:text-primary/70 transition-colors">
+                                                        {stat.icon}
+                                                        <span>{stat.label}</span>
+                                                    </div>
+                                                    <p className="font-serif italic text-xl sm:text-2xl text-foreground/90">
+                                                        {stat.value}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Deep-Dive Architecture Narrative */}
+                                        <div className="space-y-6 md:space-y-8">
+                                            <div className="flex items-center gap-4">
+                                                <span className="w-12 h-[1px] bg-primary/40" />
+                                                <h4 className="text-sm md:text-base font-mono uppercase tracking-[0.2em] text-foreground/50">
+                                                    System Architecture
+                                                </h4>
+                                            </div>
+
+                                            <div className="pl-6 md:pl-8 border-l-2 border-primary/30 py-2">
+                                                <p className="text-xl sm:text-2xl md:text-3xl font-serif italic text-foreground leading-snug">
+                                                    "{selectedProject.description}"
+                                                </p>
+                                            </div>
+
+                                            <p className="font-sans text-base sm:text-lg md:text-xl text-foreground/70 leading-relaxed font-light max-w-3xl">
+                                                {selectedProject.detailedDescription}
+                                            </p>
+                                        </div>
+
+                                        {/* Key Capabilities Cards Grid */}
+                                        <div className="space-y-6 md:space-y-8">
+                                            <div className="flex items-center gap-4">
+                                                <span className="w-12 h-[1px] bg-primary/40" />
+                                                <h4 className="text-sm md:text-base font-mono uppercase tracking-[0.2em] text-foreground/50">
+                                                    Core Technical Feats
+                                                </h4>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                                                {selectedProject.features.map((feature, i) => (
+                                                    <div 
+                                                        key={i} 
+                                                        className="p-5 sm:p-6 rounded-[1.5rem] bg-foreground/[0.015] border border-foreground/5 hover:border-primary/20 hover:bg-foreground/[0.03] transition-all duration-300 flex items-start gap-4 group shadow-sm"
+                                                    >
+                                                        <div className="mt-1 p-1.5 rounded-full bg-primary/10 text-primary shrink-0 group-hover:scale-110 group-hover:bg-primary group-hover:text-background transition-all">
+                                                            <CheckCircle2 size={16} strokeWidth={2.5} />
+                                                        </div>
+                                                        <span className="text-sm md:text-base text-foreground/80 font-light leading-relaxed">
+                                                            {feature}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Technology Stack */}
+                                        <div className="space-y-6 md:space-y-8 border-t border-foreground/10 pt-10 md:pt-12 pb-8">
+                                            <div className="flex items-center gap-4">
+                                                <span className="w-12 h-[1px] bg-primary/40" />
+                                                <h4 className="text-sm md:text-base font-mono uppercase tracking-[0.2em] text-foreground/50">
+                                                    Technology Stack
+                                                </h4>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-3">
+                                                {selectedProject.stack.map((tech, i) => (
+                                                    <span 
+                                                        key={i} 
+                                                        className="text-xs sm:text-sm font-mono tracking-wide px-5 py-2.5 rounded-full bg-foreground/[0.03] border border-foreground/10 text-foreground/80 hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-all cursor-default"
+                                                    >
+                                                        {tech}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+
+                                {/* Modal Sticky Bottom Action Bar */}
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 sm:px-10 py-5 bg-background/80 backdrop-blur-xl border-t border-foreground/5 shrink-0 z-20">
+                                    <span className="text-[10px] md:text-xs font-mono text-foreground/40 hidden md:inline-block tracking-widest uppercase">
+                                        Developed by Arya Deep Singh
+                                    </span>
+
+                                    <div className="flex items-center gap-4 w-full md:w-auto justify-center md:justify-end">
+                                        {selectedProject.githubLink && (
+                                            <a
+                                                href={selectedProject.githubLink}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="px-6 py-3 md:py-3.5 rounded-full border border-foreground/20 hover:border-foreground/40 hover:bg-foreground/5 text-foreground font-mono text-xs uppercase tracking-widest transition-all flex items-center gap-3 w-full md:w-auto justify-center"
+                                            >
+                                                <Github size={16} />
+                                                <span>Repository</span>
+                                            </a>
+                                        )}
+                                        {selectedProject.liveLink ? (
+                                            <a
+                                                href={selectedProject.liveLink}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="px-8 py-3 md:py-3.5 rounded-full bg-foreground hover:bg-primary text-background hover:text-primary-foreground font-mono text-xs uppercase tracking-widest transition-all flex items-center gap-3 shadow-xl hover:shadow-primary/20 w-full md:w-auto justify-center group"
+                                            >
+                                                <span>Launch App</span>
+                                                <ExternalLink size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                            </a>
+                                        ) : (
+                                            <span className="px-6 py-3 md:py-3.5 text-[10px] md:text-xs font-mono text-foreground/40 uppercase tracking-widest border border-foreground/10 rounded-full w-full md:w-auto text-center">
+                                                Internal Project
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </section>
     );
 };

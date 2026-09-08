@@ -47,7 +47,7 @@ const Contact = () => {
     };
 
     return (
-        <section id="contact" className="bg-background py-20 md:py-32 px-6 md:px-20 relative z-10 shadow-[0_-50px_100px_rgba(0,0,0,0.05)]">
+        <section id="contact" className="bg-background py-20 md:py-32 px-6 md:px-20 relative overflow-hidden z-10 shadow-[0_-50px_100px_rgba(0,0,0,0.05)]">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-16 md:gap-24">
                 <div className="w-full md:w-1/2">
                     <span className="text-xs uppercase tracking-[0.3em] text-foreground/40 mb-4 block">Connection</span>
@@ -128,14 +128,16 @@ const Contact = () => {
                 </div>
             </div>
 
-            <footer className="mt-40 pt-12 border-t border-foreground/10 flex flex-col md:flex-row justify-between items-center gap-8">
-                <p className="font-serif italic text-2xl">Arya Deep Singh</p>
-                <p className="text-sm text-foreground/40 font-mono italic">&copy; {new Date().getFullYear()} — Engineering Excellence</p>
-                <div className="flex gap-8 text-xs uppercase tracking-widest font-bold text-foreground/40">
-                    <a href="#hero" className="hover:text-primary transition-colors">Back to top</a>
-                    <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Resume</a>
-                </div>
-            </footer>
+            <div className="max-w-7xl mx-auto w-full">
+                <footer className="mt-40 pt-12 border-t border-foreground/10 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <p className="font-serif italic text-2xl">Arya Deep Singh</p>
+                    <p className="text-sm text-foreground/40 font-mono italic">&copy; {new Date().getFullYear()} — Engineering Excellence</p>
+                    <div className="flex gap-8 text-xs uppercase tracking-widest font-bold text-foreground/40">
+                        <a href="#hero" className="hover:text-primary transition-colors">Back to top</a>
+                        <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Resume</a>
+                    </div>
+                </footer>
+            </div>
         </section>
     );
 };

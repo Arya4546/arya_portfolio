@@ -464,10 +464,14 @@ export default function ParticleText(props: Partial<Props>) {
         // ── Mode triggers ────────────────────────────────────────────────────
         let io: IntersectionObserver | null = null
         let sentinel: HTMLDivElement | null = null
+        let isVisible = false // Track actual visibility
 
         if (mode === "onHover") {
             container.addEventListener("pointerenter", formIn)
             container.addEventListener("pointerleave", formOut)
+            // Hover mode doesn't use intersection observer natively here, but we can assume visible for now
+            // or just always render if it's onHover mode and not hidden.
+            isVisible = true;
         } else {
             // onEnter: fire when the CHOSEN part of the element scrolls into
             // view — Top edge / Middle / Bottom edge. Drop a 1px sentinel at
@@ -488,7 +492,10 @@ export default function ParticleText(props: Partial<Props>) {
                 if (entered) return
                 entered = true
                 formIn()
-                if (!replay) io?.disconnect()
+                if (!replay) {
+                     // We don't disconnect so we can keep tracking visibility for pausing
+                     // io?.disconnect()
+                }
             }
 
             // Direct viewport check for the chosen anchor — used as the resize
@@ -501,11 +508,15 @@ export default function ParticleText(props: Partial<Props>) {
                 const vw = window.innerWidth || 0
                 const y = position === "middle" ? r.top + r.height / 2 : position === "below" ? r.bottom : r.top
                 const onScreen = r.right >= 0 && r.left <= vw && r.bottom >= 0 && y <= vh
-                if (onScreen) enter()
+                if (onScreen) {
+                    isVisible = true
+                    enter()
+                }
             }
 
             io = new IntersectionObserver(
                 ([entry]) => {
+                    isVisible = entry.isIntersecting
                     if (entry.isIntersecting) {
                         enter()
                     } else if (replay) {
@@ -520,6 +531,20 @@ export default function ParticleText(props: Partial<Props>) {
                 { threshold: 0 }
             )
             io.observe(sentinel)
+            
+            // Also observe the container itself so that we know when it's offscreen to pause RAF
+            const containerIo = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting) {
+                        isVisible = true
+                    } else {
+                        isVisible = false
+                    }
+                }
+            )
+            containerIo.observe(container)
+            // Store it to clean up later
+            ;(io as any)._containerIo = containerIo
 
             // Form immediately if the anchor is already on screen at mount, then
             // retry across a few settle ticks in case layout arrives late.
@@ -547,6 +572,9 @@ export default function ParticleText(props: Partial<Props>) {
         const drawFrame = () => {
             // Canvas stays transparent so whatever sits behind shows through.
             ctx.clearRect(0, 0, cssW, cssH)
+
+            // If not visible, do not recalculate anything.
+            if (!isVisible) return
 
             const pr = pointerRef.current
             // Rendered square size, scaled so the 1–100 range stays sane.

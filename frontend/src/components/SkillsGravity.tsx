@@ -131,9 +131,16 @@ function startSimulation(container: HTMLDivElement, bodyRefs: BodyRefs): (() => 
     const onPointerLeave = () => rawMouse.mouseup(new Event('mouseup'))
     container.addEventListener('mouseleave', onPointerLeave)
 
+    let isVisible = true;
+    const visibilityIo = new IntersectionObserver(([entry]) => {
+        isVisible = entry.isIntersecting;
+    });
+    visibilityIo.observe(container);
+
     let rafId = 0
     const tick = () => {
         rafId = requestAnimationFrame(tick)
+        if (!isVisible) return;
         Matter.Engine.update(engine)
         for (let i = 0; i < bodies.length; i++) {
             const el = bodyRefs.current[i]
@@ -148,6 +155,7 @@ function startSimulation(container: HTMLDivElement, bodyRefs: BodyRefs): (() => 
     tick()
 
     return () => {
+        visibilityIo.disconnect()
         cancelAnimationFrame(rafId)
         container.removeEventListener('mouseleave', onPointerLeave)
         Matter.Composite.clear(world, false)

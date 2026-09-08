@@ -41,7 +41,7 @@ const paragraphWordVariants: Variants = {
 
 const Hero = () => {
     return (
-        <section id="hero" className="relative min-h-screen lg:fixed lg:inset-0 lg:h-[100dvh] flex items-center justify-center lg:overflow-hidden bg-background pt-32 lg:pt-0 pb-24 lg:pb-0">
+        <section id="hero" className="relative min-h-screen lg:fixed lg:inset-0 lg:h-[100dvh] flex items-center justify-center overflow-hidden bg-background pt-32 lg:pt-0 pb-24 lg:pb-0">
             {/* Subtle background glow */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse" />

@@ -27,7 +27,7 @@ const services: Service[] = [
 
 const Services = () => {
     return (
-        <section id="services" className="bg-background px-6 md:px-20 pt-32 pb-16">
+        <section id="services" className="bg-background px-6 md:px-20 pt-20 md:pt-32 pb-16 relative z-10 border-t border-foreground/5">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-20 md:mb-32">
                     <span className="text-xs uppercase tracking-[0.4em] text-foreground/40 mb-4 md:mb-6 block">Areas of Mastery</span>
