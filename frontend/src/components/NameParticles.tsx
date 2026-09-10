@@ -29,14 +29,12 @@ const useThemeColors = () => {
     return colors;
 };
 
-// Detect touch devices (iPhones, Android) — they get the Framer Motion fallback
-// instead of the canvas particle animation to prevent iOS GPU memory crashes.
-const useIsTouchDevice = (): boolean => {
-    const [isTouch, setIsTouch] = useState(false);
-    useEffect(() => {
-        setIsTouch(window.matchMedia('(pointer: coarse)').matches);
-    }, []);
-    return isTouch;
+// Detect touch devices synchronously at first render — using a lazy initializer
+// so useState resolves the correct value BEFORE the first paint. This guarantees
+// ParticleText (30k particle canvas) never mounts on iOS even for a single frame.
+const isTouchDevice = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(pointer: coarse)').matches;
 };
 
 // Premium character-by-character reveal for mobile — matches the cinematic
@@ -90,7 +88,8 @@ const MobileNameReveal = () => {
 
 const NameParticles = () => {
     const colors = useThemeColors();
-    const isTouch = useIsTouchDevice();
+    // Synchronous check — resolved before first render so canvas never mounts on iOS
+    const isTouch = isTouchDevice();
 
     return (
         <h1 className="relative w-full mb-4 lg:mb-8 pb-2 lg:pb-4">

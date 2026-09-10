@@ -14,26 +14,46 @@ import Contact from './components/Contact';
 
 function App() {
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      syncTouch: true,
-      touchMultiplier: 1.5,
-    });
+    let lenis: InstanceType<typeof Lenis> | null = null;
+    let rafId: number | null = null;
 
-    (window as any).__lenis = lenis;
+    const raf = (time: number) => {
+      lenis?.raf(time);
+      if (!document.hidden) {
+        rafId = requestAnimationFrame(raf);
+      }
+    };
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+    const handleVisibility = () => {
+      if (!document.hidden && lenis) {
+        rafId = requestAnimationFrame(raf);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
-    requestAnimationFrame(raf);
+    // Delay Lenis start until AFTER the preloader is completely gone (2s timer + 1.5s exit animation).
+    // This prevents Lenis from conflicting with iOS Safari's scroll context during the initial load.
+    const initTimer = setTimeout(() => {
+      lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        syncTouch: true,
+        touchMultiplier: 1.5,
+      });
+
+      (window as any).__lenis = lenis;
+      rafId = requestAnimationFrame(raf);
+    }, 3600);
 
     return () => {
-      delete (window as any).__lenis;
-      lenis.destroy();
+      clearTimeout(initTimer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      if (rafId != null) cancelAnimationFrame(rafId);
+      if (lenis) {
+        delete (window as any).__lenis;
+        lenis.destroy();
+      }
     };
   }, []);
 
