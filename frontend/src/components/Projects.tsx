@@ -191,234 +191,146 @@ const Projects = () => {
     }, []);
 
     return (
-        <section ref={targetRef} id="projects" className="relative bg-background text-foreground shrink-0 border-t border-foreground/5 z-20
-            h-auto md:h-[450vh]">
-            {/* Horizontal Scroll Progress Bar — desktop only */}
+        <section ref={targetRef} id="projects" className="relative h-[420vh] md:h-[450vh] bg-background text-foreground shrink-0 border-t border-foreground/5 z-20">
+            {/* Horizontal Scroll Progress Bar */}
             <motion.div 
-                className="hidden md:block sticky top-0 left-0 h-1 bg-primary z-50 origin-left"
+                className="sticky top-0 left-0 h-1 bg-primary z-50 origin-left"
                 style={{ scaleX: scrollYProgress }} 
             />
 
             {/* Ambient Section Gradient */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-background to-background pointer-events-none opacity-60" />
-
-            {/* ── MOBILE LAYOUT: vertical stacked cards ── */}
-            <div className="md:hidden flex flex-col px-4 pt-16 pb-12 gap-6">
-                {/* Mobile Section Header */}
-                <div className="flex flex-col mb-4">
-                    <div className="flex items-center gap-3 mb-4">
-                        <span className="w-6 h-[1px] bg-primary/70" />
-                        <span className="text-xs uppercase tracking-[0.3em] text-foreground/75 font-mono font-medium">Selected Work</span>
-                    </div>
-                    <h2 className="text-4xl leading-[1.08] mb-3 font-serif tracking-tight">
-                        Featured <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-br from-foreground via-foreground/90 to-foreground/40 italic">Projects.</span>
-                    </h2>
-                    <p className="text-foreground/70 leading-relaxed text-sm font-light">
-                        A curated selection of enterprise platforms, full-stack systems, and architectural sandboxes.
-                    </p>
-                </div>
-
-                {/* Mobile Project Cards — vertical, full-width, auto height */}
-                {projectsData.map((project, index) => (
-                    <div
-                        key={project.id}
-                        className="w-full flex flex-col p-5 rounded-[1.75rem] bg-foreground/[0.02] border border-foreground/10 relative overflow-hidden shadow-xl shadow-black/5"
-                    >
-                        {/* Decorative Background Orb */}
-                        <div className="absolute -top-20 -left-20 w-44 h-44 bg-primary/10 rounded-full blur-[70px] pointer-events-none" />
-
-                        {/* Header: Icon + Category + Links */}
-                        <div className="flex justify-between items-start mb-4 relative z-10">
-                            <div className="flex items-center gap-3">
-                                <div className="w-11 h-11 rounded-2xl bg-background border border-foreground/10 flex items-center justify-center shadow-lg">
-                                    {project.icon}
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] uppercase tracking-widest text-primary/80 font-mono font-medium leading-tight">{project.category}</span>
-                                    <span className="text-xs font-medium text-foreground/80">{project.year}</span>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {project.githubLink && (
-                                    <a href={project.githubLink} target="_blank" rel="noopener noreferrer"
-                                        className="w-9 h-9 rounded-full flex items-center justify-center bg-foreground/5 border border-foreground/10 text-foreground/70"
-                                        aria-label={`View ${project.title} on GitHub`}>
-                                        <Github size={16} />
-                                    </a>
-                                )}
-                                {project.liveLink && (
-                                    <a href={project.liveLink} target="_blank" rel="noopener noreferrer"
-                                        className="w-9 h-9 rounded-full flex items-center justify-center bg-foreground/5 border border-foreground/10 text-foreground/70"
-                                        aria-label={`View ${project.title} Live`}>
-                                        <ExternalLink size={16} />
-                                    </a>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Title & Description */}
-                        <div className="relative z-10 mb-4">
-                            <h3 className="text-2xl font-serif tracking-tight mb-2">{project.title}</h3>
-                            <p className="text-foreground/70 text-sm leading-relaxed font-light line-clamp-3">{project.description}</p>
-                        </div>
-
-                        {/* Tech Stack */}
-                        <div className="flex flex-wrap gap-1.5 mb-4 relative z-10">
-                            {project.stack.map((tech, i) => (
-                                <span key={i} className="text-[10px] font-mono font-medium px-2.5 py-1 rounded-full bg-foreground/[0.03] border border-foreground/10 text-foreground/80">
-                                    {tech}
-                                </span>
-                            ))}
-                        </div>
-
-                        {/* Key Capabilities */}
-                        <div className="border-t border-foreground/10 pt-4 relative z-10">
-                            <span className="text-[9px] uppercase tracking-widest text-foreground/50 mb-2.5 block font-mono font-semibold">Key Capabilities</span>
-                            <div className="flex flex-col gap-1.5 mb-4">
-                                {project.features.map((feature, i) => (
-                                    <div key={i} className="flex items-start gap-2">
-                                        <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary/80 shrink-0" />
-                                        <span className="text-xs text-foreground/70 leading-snug font-light">{feature}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* CTA row */}
-                            <div className="flex items-center justify-between pt-3 border-t border-foreground/5">
-                                <span className="text-[10px] font-mono text-foreground/40 uppercase tracking-widest">0{index + 1} / 04</span>
-                                <button
-                                    onClick={() => setSelectedProject(project)}
-                                    className="text-[10px] font-mono uppercase tracking-widest text-foreground flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-foreground/5 border border-foreground/10 active:scale-95 transition-transform"
-                                >
-                                    <span>Case Study</span>
-                                    <ArrowRight size={12} className="text-primary" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* ── DESKTOP LAYOUT: horizontal scroll (unchanged) ── */}
-            <div className="hidden md:flex sticky top-[8vh] h-[90vh] items-center overflow-hidden">
+            
+            <div className="sticky top-[4vh] sm:top-[6vh] md:top-[8vh] h-[92vh] md:h-[90vh] flex items-center overflow-hidden">
                 <motion.div 
                     ref={trackRef}
                     style={{ x }} 
-                    className="flex gap-14 px-24 items-center will-change-transform"
+                    className="flex gap-5 sm:gap-8 md:gap-14 px-4 sm:px-8 md:px-24 items-start will-change-transform"
                 >
                     {/* Header Section */}
-                    <div className="flex flex-col justify-center w-[38vw] max-w-[480px] pr-12 relative shrink-0">
-                        <div className="absolute -left-10 top-8 w-[2px] h-28 bg-gradient-to-b from-primary to-transparent opacity-60" />
+                    <div className="flex flex-col justify-center w-[80vw] sm:w-[70vw] md:w-[38vw] max-w-[480px] pr-4 md:pr-12 relative shrink-0 self-center">
+                        {/* Decorative Left Line */}
+                        <div className="absolute -left-6 md:-left-10 top-8 w-[2px] h-28 bg-gradient-to-b from-primary to-transparent opacity-60 hidden md:block" />
                         
-                        <div className="flex items-center gap-3 mb-6">
-                            <span className="w-8 h-[1px] bg-primary/70" />
-                            <span className="text-xs uppercase tracking-[0.3em] text-foreground/75 font-mono font-medium">Selected Work</span>
+                        <div className="flex items-center gap-3 mb-4 md:mb-6">
+                            <span className="w-6 md:w-8 h-[1px] bg-primary/70" />
+                            <span className="text-xs uppercase tracking-[0.3em] text-foreground/75 font-mono font-medium">
+                                Selected Work
+                            </span>
                         </div>
 
-                        <h2 className="text-[6vw] leading-[1.08] mb-6 font-serif tracking-tight">
+                        <h2 className="text-4xl sm:text-5xl md:text-[6vw] leading-[1.08] mb-6 font-serif tracking-tight">
                             Featured <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-foreground via-foreground/90 to-foreground/40 italic">Projects.</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-foreground via-foreground/90 to-foreground/40 italic">
+                                Projects.
+                            </span>
                         </h2>
-                        <p className="text-foreground/70 max-w-md leading-relaxed text-lg font-light">
+                        <p className="text-foreground/70 max-w-md leading-relaxed text-sm sm:text-base md:text-lg font-light">
                             A curated selection of enterprise platforms, full-stack systems, and architectural sandboxes.
                         </p>
 
-                        <div className="flex items-center gap-4 text-foreground/40 mt-12">
-                            <div className="w-12 h-[1px] bg-foreground/20" />
-                            <span className="text-xs uppercase tracking-widest font-mono">Scroll Horizontally</span>
+                        {/* Scroll Indicator */}
+                        <div className="flex items-center gap-4 text-foreground/40 mt-8 md:mt-12">
+                            <div className="w-8 md:w-12 h-[1px] bg-foreground/20" />
+                            <span className="text-xs uppercase tracking-widest font-mono">Scroll</span>
                             <ArrowRight size={14} className="opacity-60" />
                         </div>
                     </div>
 
-                    {/* Desktop Project Cards */}
+                    {/* Project Cards */}
                     {projectsData.map((project, index) => (
                         <div
                             key={project.id}
-                            className="w-[50vw] lg:w-[44vw] max-w-[580px] h-[78vh] max-h-[720px] flex flex-col justify-between p-10 rounded-[2.5rem] bg-foreground/[0.02] border border-foreground/10 hover:bg-foreground/[0.035] hover:border-foreground/20 transition-all duration-500 relative overflow-hidden group shadow-2xl shadow-black/5 shrink-0"
+                            className="w-[82vw] sm:w-[72vw] md:w-[50vw] lg:w-[44vw] max-w-[580px] min-h-[75vh] md:min-h-[78vh] max-h-[88vh] flex flex-col p-5 sm:p-7 md:p-10 rounded-[2rem] sm:rounded-[2.5rem] bg-foreground/[0.02] border border-foreground/10 hover:bg-foreground/[0.035] hover:border-foreground/20 transition-all duration-500 relative overflow-hidden group shadow-2xl shadow-black/5 shrink-0"
                         >
                             {/* Giant Watermark Number */}
-                            <div className="absolute bottom-4 right-6 text-[11rem] font-serif font-bold text-foreground/[0.03] leading-none pointer-events-none select-none group-hover:scale-105 group-hover:text-foreground/[0.05] transition-all duration-700 origin-bottom-right">
+                            <div className="absolute bottom-4 right-6 text-[7rem] sm:text-[9rem] md:text-[11rem] font-serif font-bold text-foreground/[0.03] leading-none pointer-events-none select-none group-hover:scale-105 group-hover:text-foreground/[0.05] transition-all duration-700 origin-bottom-right">
                                 0{index + 1}
                             </div>
                             
                             {/* Decorative Background Orb */}
                             <div className="absolute -top-28 -left-28 w-56 h-56 bg-primary/10 rounded-full blur-[90px] pointer-events-none group-hover:bg-primary/20 transition-colors duration-700" />
 
-                            <div className="flex flex-col h-full justify-between overflow-y-auto no-scrollbar z-10 relative">
-                                {/* Top: Header, Icon & Links */}
-                                <div className="flex justify-between items-start mb-5 shrink-0">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 rounded-2xl bg-background border border-foreground/10 flex items-center justify-center shadow-lg group-hover:border-primary/50 group-hover:shadow-primary/10 transition-all duration-500">
-                                            {project.icon}
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] uppercase tracking-widest text-primary/80 font-mono font-medium">{project.category}</span>
-                                            <span className="text-sm font-medium text-foreground/80">{project.year}</span>
-                                        </div>
+                            {/* Top: Header, Icon & Links */}
+                            <div className="flex justify-between items-start mb-4 shrink-0 relative z-10">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-2xl bg-background border border-foreground/10 flex items-center justify-center shadow-lg group-hover:border-primary/50 group-hover:shadow-primary/10 transition-all duration-500">
+                                        {project.icon}
                                     </div>
-                                    
-                                    <div className="flex items-center gap-2">
-                                        {project.githubLink && (
-                                            <a href={project.githubLink} target="_blank" rel="noopener noreferrer"
-                                                className="w-11 h-11 rounded-full transition-all duration-300 flex items-center justify-center group/link bg-foreground/5 hover:bg-foreground/10 text-foreground hover:scale-110"
-                                                aria-label={`View ${project.title} on GitHub`}>
-                                                <Github size={18} className="group-hover/link:text-primary transition-colors" />
-                                            </a>
-                                        )}
-                                        {project.liveLink && (
-                                            <a href={project.liveLink} target="_blank" rel="noopener noreferrer"
-                                                className="w-11 h-11 rounded-full transition-all duration-300 flex items-center justify-center group/link bg-foreground/5 hover:bg-foreground/10 text-foreground hover:scale-110"
-                                                aria-label={`View ${project.title} Live`}>
-                                                <ExternalLink size={18} className="group-hover/link:text-primary transition-colors" />
-                                            </a>
-                                        )}
+                                    <div className="flex flex-col">
+                                        <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-primary/80 font-mono font-medium leading-tight">
+                                            {project.category}
+                                        </span>
+                                        <span className="text-xs font-medium text-foreground/80">
+                                            {project.year}
+                                        </span>
                                     </div>
                                 </div>
+                                
+                                <div className="flex items-center gap-2">
+                                    {project.githubLink && (
+                                        <a href={project.githubLink} target="_blank" rel="noopener noreferrer"
+                                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all duration-300 flex items-center justify-center bg-foreground/5 hover:bg-foreground/10 text-foreground hover:scale-110"
+                                            aria-label={`View ${project.title} on GitHub`}>
+                                            <Github size={15} className="group-hover/link:text-primary transition-colors" />
+                                        </a>
+                                    )}
+                                    {project.liveLink && (
+                                        <a href={project.liveLink} target="_blank" rel="noopener noreferrer"
+                                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all duration-300 flex items-center justify-center bg-foreground/5 hover:bg-foreground/10 text-foreground hover:scale-110"
+                                            aria-label={`View ${project.title} Live`}>
+                                            <ExternalLink size={15} className="group-hover/link:text-primary transition-colors" />
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
 
-                                {/* Middle: Title, Description, Stack */}
-                                <div className="my-auto py-1">
-                                    <h3 className="text-4xl lg:text-5xl font-serif tracking-tight mb-3 group-hover:text-primary transition-colors duration-500">
-                                        {project.title}
-                                    </h3>
-                                    <p className="text-foreground/75 text-base leading-relaxed font-light mb-5">
-                                        {project.description}
-                                    </p>
-                                    
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        {project.stack.map((tech, i) => (
-                                            <span key={i} className="text-xs font-mono font-medium px-3 py-1 rounded-full bg-foreground/[0.03] border border-foreground/10 text-foreground/80 backdrop-blur-md group-hover:bg-foreground/[0.06] group-hover:border-foreground/20 transition-all duration-300">
-                                                {tech}
+                            {/* Middle: Title, Description, Stack */}
+                            <div className="relative z-10 mb-3">
+                                <h3 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-serif tracking-tight mb-2 group-hover:text-primary transition-colors duration-500">
+                                    {project.title}
+                                </h3>
+                                <p className="text-foreground/75 text-xs sm:text-sm md:text-base leading-relaxed font-light line-clamp-3 mb-3">
+                                    {project.description}
+                                </p>
+                                
+                                <div className="flex flex-wrap gap-1.5 mb-2">
+                                    {project.stack.map((tech, i) => (
+                                        <span key={i} className="text-[9px] sm:text-[10px] md:text-xs font-mono font-medium px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-foreground/[0.03] border border-foreground/10 text-foreground/80 backdrop-blur-md group-hover:bg-foreground/[0.06] group-hover:border-foreground/20 transition-all duration-300">
+                                            {tech}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Bottom: Key Capabilities & CTA */}
+                            <div className="border-t border-foreground/10 pt-3 mt-auto shrink-0 relative z-10">
+                                <span className="text-[9px] uppercase tracking-widest text-foreground/50 mb-2 block font-mono font-semibold">
+                                    Key Capabilities
+                                </span>
+                                
+                                <div className="flex flex-col gap-1 sm:grid sm:grid-cols-2 sm:gap-x-3 sm:gap-y-1.5 md:gap-y-2.5 mb-3">
+                                    {project.features.map((feature, i) => (
+                                        <div key={i} className="flex items-start gap-2">
+                                            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary/80 shrink-0" />
+                                            <span className="text-[10px] sm:text-xs md:text-sm text-foreground/75 leading-snug font-light">
+                                                {feature}
                                             </span>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    ))}
                                 </div>
 
-                                {/* Bottom: Key Capabilities & CTA */}
-                                <div className="border-t border-foreground/10 pt-5 mt-auto shrink-0">
-                                    <span className="text-[10px] uppercase tracking-widest text-foreground/50 mb-3 block font-mono font-semibold">Key Capabilities</span>
-                                    
-                                    <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-4">
-                                        {project.features.map((feature, i) => (
-                                            <div key={i} className="flex items-start gap-2.5">
-                                                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary/80 shrink-0 group-hover:scale-125 transition-transform" />
-                                                <span className="text-sm text-foreground/75 leading-snug font-light group-hover:text-foreground transition-colors">
-                                                    {feature}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-2.5 border-t border-foreground/5">
-                                        <span className="text-[10px] font-mono text-foreground/40 uppercase tracking-widest">0{index + 1} / 04</span>
-                                        <button
-                                            onClick={() => setSelectedProject(project)}
-                                            className="text-xs font-mono uppercase tracking-widest text-foreground hover:text-primary flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 hover:border-primary/40 transition-all group/cta"
-                                        >
-                                            <span>Read Case Study</span>
-                                            <ArrowRight size={13} className="group-hover/cta:translate-x-1 transition-transform text-primary" />
-                                        </button>
-                                    </div>
+                                <div className="flex items-center justify-between pt-2 border-t border-foreground/5">
+                                    <span className="text-[9px] sm:text-[10px] font-mono text-foreground/40 uppercase tracking-widest">
+                                        0{index + 1} / 04
+                                    </span>
+                                    <button
+                                        onClick={() => setSelectedProject(project)}
+                                        className="text-[9px] sm:text-[10px] md:text-xs font-mono uppercase tracking-widest text-foreground hover:text-primary flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 hover:border-primary/40 transition-all group/cta active:scale-95"
+                                    >
+                                        <span>Case Study</span>
+                                        <ArrowRight size={11} className="group-hover/cta:translate-x-1 transition-transform text-primary" />
+                                    </button>
                                 </div>
                             </div>
                         </div>
