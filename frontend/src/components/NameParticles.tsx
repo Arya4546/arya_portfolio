@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import ParticleText from './ParticleText';
 
 // Reads the site's monochrome theme tokens directly from CSS custom properties
@@ -28,43 +29,106 @@ const useThemeColors = () => {
     return colors;
 };
 
+// Detect touch devices (iPhones, Android) — they get the Framer Motion fallback
+// instead of the canvas particle animation to prevent iOS GPU memory crashes.
+const useIsTouchDevice = (): boolean => {
+    const [isTouch, setIsTouch] = useState(false);
+    useEffect(() => {
+        setIsTouch(window.matchMedia('(pointer: coarse)').matches);
+    }, []);
+    return isTouch;
+};
+
+// Premium character-by-character reveal for mobile — matches the cinematic
+// feel of the particle animation without the heavy canvas computation.
+const MobileNameReveal = () => {
+    const line1 = 'Arya';
+    const line2 = 'Deep Singh';
+
+    const containerVariants = {
+        hidden: {},
+        visible: {
+            transition: { staggerChildren: 0.04, delayChildren: 0.2 },
+        },
+    };
+
+    const charVariants = {
+        hidden: { opacity: 0, y: '0.3em', filter: 'blur(8px)' },
+        visible: {
+            opacity: 1,
+            y: '0em',
+            filter: 'blur(0px)',
+            transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+        },
+    };
+
+    const renderLine = (text: string) =>
+        text.split('').map((char, i) => (
+            <motion.span
+                key={i}
+                variants={charVariants}
+                style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal' }}
+            >
+                {char}
+            </motion.span>
+        ));
+
+    return (
+        <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="font-serif italic font-normal leading-[0.92] tracking-tight w-full"
+            style={{ fontSize: 'clamp(3.2rem, 16vw, 6rem)' }}
+            aria-label="Arya Deep Singh — Backend Developer"
+        >
+            <div className="block">{renderLine(line1)}</div>
+            <div className="block">{renderLine(line2)}</div>
+        </motion.div>
+    );
+};
+
 const NameParticles = () => {
     const colors = useThemeColors();
+    const isTouch = useIsTouchDevice();
 
     return (
         <h1 className="relative w-full mb-4 lg:mb-8 pb-2 lg:pb-4">
             <span className="sr-only">Arya Deep Singh — Backend Developer</span>
-            {/* Single canvas for both lines: they must share one auto-fit pass so
-                "Arya" and "Deep Singh" render at the exact same size — fitting each
-                line's own canvas independently made the shorter word render larger.
-                Box height (not width) is what auto-fit sizes off for a two-line
-                block, so it needs real headroom — too tight here and both lines
-                get shrunk well below the original single-line 7rem/8vw/14vw scale
-                just to keep from clipping vertically. */}
-            <div aria-hidden="true" className="w-full h-[34vw] md:h-[19vw] lg:h-[15.5rem]">
-                <ParticleText
-                    text={'Arya\nDeep Singh'}
-                    colors={colors}
-                    mode="onEnter"
-                    position="above"
-                    replay={false}
-                    autoFit
-                    fontSize={260}
-                    align="left"
-                    fontFamily='"Instrument Serif", Georgia, serif'
-                    fontWeight={400}
-                    italic
-                    lineHeightMultiplier={0.92}
-                    particleSize={8}
-                    particleCount={50}
-                    mouseEnabled
-                    mouseRadius={70}
-                    mouseForce={28}
-                    transition={{ type: 'tween', duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-                />
-            </div>
+
+            {isTouch ? (
+                // Mobile / iOS: Framer Motion text reveal — no canvas, no GPU crash
+                <div aria-hidden="true" className="w-full h-[34vw] md:h-[19vw] lg:h-[15.5rem] flex items-center">
+                    <MobileNameReveal />
+                </div>
+            ) : (
+                // Desktop: Full particle canvas animation — unchanged
+                <div aria-hidden="true" className="w-full h-[34vw] md:h-[19vw] lg:h-[15.5rem]">
+                    <ParticleText
+                        text={'Arya\nDeep Singh'}
+                        colors={colors}
+                        mode="onEnter"
+                        position="above"
+                        replay={false}
+                        autoFit
+                        fontSize={260}
+                        align="left"
+                        fontFamily='"Instrument Serif", Georgia, serif'
+                        fontWeight={400}
+                        italic
+                        lineHeightMultiplier={0.92}
+                        particleSize={8}
+                        particleCount={50}
+                        mouseEnabled
+                        mouseRadius={70}
+                        mouseForce={28}
+                        transition={{ type: 'tween', duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+                    />
+                </div>
+            )}
         </h1>
     );
 };
 
 export default NameParticles;
+

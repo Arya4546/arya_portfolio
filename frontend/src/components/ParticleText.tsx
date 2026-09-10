@@ -708,18 +708,36 @@ export default function ParticleText(props: Partial<Props>) {
             container.removeEventListener("pointerenter", formIn)
             container.removeEventListener("pointerleave", formOut)
             io?.disconnect()
+            ;(io as any)?._containerIo?.disconnect()
             sentinel?.remove()
             enterTimers.forEach(clearTimeout)
         }
 
+        let loopRunning = true;
         const loop = () => {
             drawFrame()
-            rafRef.current = requestAnimationFrame(loop)
+            if (loopRunning) rafRef.current = requestAnimationFrame(loop)
         }
+
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                if (rafRef.current != null) {
+                    cancelAnimationFrame(rafRef.current)
+                    rafRef.current = null
+                }
+            } else if (loopRunning) {
+                lastFrameRef.current = null // reset dt so first frame after resume doesn't jump
+                rafRef.current = requestAnimationFrame(loop)
+            }
+        }
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+
         rafRef.current = requestAnimationFrame(loop)
 
         return () => {
+            loopRunning = false
             if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
             canvas.removeEventListener("pointermove", onMove)
             canvas.removeEventListener("pointerleave", onLeave)
             canvas.removeEventListener("pointercancel", onLeave)

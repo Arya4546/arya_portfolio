@@ -223,27 +223,72 @@ export default function LiveStatusWidget() {
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const streamUrl = `${API_URL}/stream`;
-    const eventSource = new EventSource(streamUrl);
+    let eventSource: EventSource | null = null;
+    let isDestroyed = false;
 
-    eventSource.onmessage = (event) => {
+    // Fallback: if SSE never connects (Render cold start, network issue, iOS bug),
+    // try a plain HTTP fetch after 5 seconds so iOS Safari doesn't hang forever.
+    const fallbackTimer = setTimeout(async () => {
+      if (hasReceivedData.current || isDestroyed) return;
+      // Close the hanging SSE connection — critical for iOS Safari
+      eventSource?.close();
+      eventSource = null;
       try {
-        const data: ActivityData = JSON.parse(event.data);
-        setActivity(data);
-        hasReceivedData.current = true;
-      } catch (err) {
-        console.error('Error parsing SSE data', err);
+        const controller = new AbortController();
+        const fetchTimer = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch(API_URL, { signal: controller.signal });
+        clearTimeout(fetchTimer);
+        if (!res.ok) throw new Error('not ok');
+        const data: ActivityData = await res.json();
+        if (!isDestroyed) {
+          setActivity(data);
+          hasReceivedData.current = true;
+        }
+      } catch {
+        if (!isDestroyed && !hasReceivedData.current) {
+          setActivity({ statusLabel: 'Offline', icon: null, appName: null, startedAt: null });
+        }
       }
-    };
+    }, 5000);
 
-    eventSource.onerror = () => {
-      if (!hasReceivedData.current) {
+    const streamUrl = `${API_URL}/stream`;
+    try {
+      eventSource = new EventSource(streamUrl);
+
+      eventSource.onmessage = (event) => {
+        clearTimeout(fallbackTimer);
+        try {
+          const data: ActivityData = JSON.parse(event.data);
+          if (!isDestroyed) {
+            setActivity(data);
+            hasReceivedData.current = true;
+          }
+        } catch (err) {
+          console.error('Error parsing SSE data', err);
+        }
+      };
+
+      eventSource.onerror = () => {
+        // On error: close immediately instead of letting Safari retry-loop forever
+        eventSource?.close();
+        eventSource = null;
+        clearTimeout(fallbackTimer);
+        if (!hasReceivedData.current && !isDestroyed) {
+          setActivity({ statusLabel: 'Offline', icon: null, appName: null, startedAt: null });
+        }
+      };
+    } catch {
+      // EventSource constructor itself can throw on some iOS versions
+      clearTimeout(fallbackTimer);
+      if (!isDestroyed) {
         setActivity({ statusLabel: 'Offline', icon: null, appName: null, startedAt: null });
       }
-    };
+    }
 
     return () => {
-      eventSource.close();
+      isDestroyed = true;
+      clearTimeout(fallbackTimer);
+      eventSource?.close();
     };
   }, []);
 

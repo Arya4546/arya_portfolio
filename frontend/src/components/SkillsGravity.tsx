@@ -138,7 +138,19 @@ function startSimulation(container: HTMLDivElement, bodyRefs: BodyRefs): (() => 
     visibilityIo.observe(container);
 
     let rafId = 0
+    let running = true;
+
+    const pauseOnHidden = () => {
+        if (document.hidden) {
+            cancelAnimationFrame(rafId);
+        } else if (running) {
+            rafId = requestAnimationFrame(tick);
+        }
+    };
+    document.addEventListener('visibilitychange', pauseOnHidden);
+
     const tick = () => {
+        if (!running) return;
         rafId = requestAnimationFrame(tick)
         if (!isVisible) return;
         Matter.Engine.update(engine)
@@ -155,8 +167,10 @@ function startSimulation(container: HTMLDivElement, bodyRefs: BodyRefs): (() => 
     tick()
 
     return () => {
+        running = false;
         visibilityIo.disconnect()
         cancelAnimationFrame(rafId)
+        document.removeEventListener('visibilitychange', pauseOnHidden);
         container.removeEventListener('mouseleave', onPointerLeave)
         Matter.Composite.clear(world, false)
         Matter.Engine.clear(engine)

@@ -13,7 +13,7 @@ const About = () => {
     const videoY = useTransform(scrollYProgress, [0, 1], ["8%", "-8%"]);
 
     return (
-        <section id="about" ref={container} className="relative bg-foreground/[0.015] z-20 shadow-[0_-30px_80px_rgba(0,0,0,0.1)] w-full overflow-hidden border-t border-foreground/10 rounded-t-[2.5rem] md:rounded-t-[4rem] -mt-6 md:-mt-10">
+        <section id="about" ref={container} className="relative bg-background z-20 shadow-[0_-30px_80px_rgba(0,0,0,0.1)] w-full overflow-hidden border-t border-foreground/10 rounded-t-[2.5rem] md:rounded-t-[4rem] -mt-6 md:-mt-10">
             {/* Ambient Top Glow to separate from Hero */}
             <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
             

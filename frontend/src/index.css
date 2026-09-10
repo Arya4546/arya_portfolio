@@ -84,6 +84,8 @@
 .modal-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(120, 120, 120, 0.25) transparent;
+  -webkit-overflow-scrolling: touch; /* iOS momentum scroll inside modal */
+  overscroll-behavior: contain;
 }
 
 .modal-scrollbar::-webkit-scrollbar {
