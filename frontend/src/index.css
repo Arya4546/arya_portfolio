@@ -59,7 +59,7 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
     scroll-behavior: smooth;
-    overflow-x: clip;
+    
     @apply bg-background text-foreground;
   }
 
@@ -71,7 +71,7 @@
 
   #root {
     width: 100%;
-    overflow-x: clip;
+    
   }
 
   h1,

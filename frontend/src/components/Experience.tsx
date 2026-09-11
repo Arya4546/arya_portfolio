@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 const experiences = [
     {
@@ -28,6 +29,15 @@ const experiences = [
 ];
 
 const Experience = () => {
+    const [isMobile, setIsMobile] = useState(true);
+    
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 1024);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
+
     return (
         <section id="experience" className="bg-background py-20 md:py-32 lg:py-48 px-6 md:px-12 relative border-t border-foreground/5 z-10">
             <div className="max-w-[90rem] mx-auto flex flex-col lg:flex-row gap-16 lg:gap-32">
@@ -35,7 +45,7 @@ const Experience = () => {
                 {/* Left Column: Sticky Header */}
                 <div className="lg:w-1/3 lg:sticky lg:top-40 h-fit">
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: isMobile ? 1 : 0, y: isMobile ? 0 : 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1 }}
                         viewport={{ once: true }}
@@ -56,7 +66,7 @@ const Experience = () => {
                     {experiences.map((exp, index) => (
                         <motion.div
                             key={index}
-                            initial={{ opacity: 0, y: 40 }}
+                            initial={{ opacity: isMobile ? 1 : 0, y: isMobile ? 0 : 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                             viewport={{ once: true, margin: "-50px" }}

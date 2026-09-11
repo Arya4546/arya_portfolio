@@ -1,13 +1,18 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import aryaImg from '../assets/arya.png';
 
-// On touch/mobile: content starts fully visible (opacity 1) — iOS Safari's
-// IntersectionObserver fires late, causing blank screens when initial opacity is 0.
-// On desktop: full cinematic fade-up entrance animation is preserved.
-const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
-
 const About = () => {
+    // Default to true so mobile never flashes invisible. Desktop will quickly flip to false.
+    const [isMobile, setIsMobile] = useState(true);
+    
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 1024);
+        check(); // check immediately
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
+
     const container = useRef<HTMLElement>(null);
     const { scrollYProgress } = useScroll({
         target: container,
@@ -26,7 +31,7 @@ const About = () => {
                 {/* Left Side - Content */}
                 <div className="w-full md:w-1/2 flex flex-col justify-center px-6 sm:px-12 md:px-16 lg:px-24 py-8 md:py-0 z-10">
                     <motion.div
-                        initial={{ opacity: isTouch ? 1 : 0, y: isTouch ? 0 : 24 }}
+                        initial={{ opacity: isMobile ? 1 : 0, y: isMobile ? 0 : 24 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.1 }}
                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -53,7 +58,7 @@ const About = () => {
                             </p>
                             <div className="pt-6 md:pt-10 grid grid-cols-2 gap-6 md:gap-12 border-t border-foreground/10">
                                 <motion.div 
-                                    initial={{ opacity: isTouch ? 1 : 0, y: isTouch ? 0 : 16 }}
+                                    initial={{ opacity: isMobile ? 1 : 0, y: isMobile ? 0 : 16 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true, amount: 0.1 }}
                                     transition={{ duration: 0.8, delay: 0.2 }}
@@ -62,7 +67,7 @@ const About = () => {
                                     <p className="font-serif italic text-xl sm:text-2xl md:text-3xl lg:text-4xl text-foreground">Aesthetic Code</p>
                                 </motion.div>
                                 <motion.div
-                                    initial={{ opacity: isTouch ? 1 : 0, y: isTouch ? 0 : 16 }}
+                                    initial={{ opacity: isMobile ? 1 : 0, y: isMobile ? 0 : 16 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true, amount: 0.1 }}
                                     transition={{ duration: 0.8, delay: 0.3 }}
@@ -79,7 +84,7 @@ const About = () => {
                 <div className="w-full md:w-1/2 h-[50vh] sm:h-[60vh] md:h-screen relative flex items-center justify-center mt-12 md:mt-0 pb-12 md:pb-0">
                     <motion.div
                         style={{ y: videoY }}
-                        initial={{ opacity: isTouch ? 1 : 0, scale: isTouch ? 1 : 0.95 }}
+                        initial={{ opacity: isMobile ? 1 : 0, scale: isMobile ? 1 : 0.95 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true, amount: 0.05 }}
                         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
